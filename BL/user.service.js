@@ -9,7 +9,7 @@ const login = async (data) => {
     }
     /* navigate to register?*/
     /* do the bycrypt */
-    let token = await auth.createToken(data)
+    let token = await auth.createToken(data.email)
     return token
 }
 
@@ -22,7 +22,7 @@ const register = async (data) => {
         throw "missing data"
     }
     user = await userDL.create({data})
-    let token = await auth.createToken(data)
+    let token = await auth.createToken(data.email)
     return token
 }
 const getUser = async (email) => {
