@@ -24,10 +24,9 @@ const userSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
-    projects: {
-    type: Array,
-    default: [{}],
-  },
+    projects:[{
+        
+    }],
   isActive: {
     type: Boolean,
     default: true,

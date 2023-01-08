@@ -2,6 +2,15 @@ require("./db").connect();
 const mongoose = require("mongoose");
 
 const projectSchema = new mongoose.Schema({
+  id:{
+    type: mongoose.SchemaTypes.ObjectId,
+  },
+  rootFolder:{
+    path:{
+      type: String,
+      required: true, 
+    },
+  },
   s1: { 
     path:{
     type:String,
@@ -23,10 +32,6 @@ const projectSchema = new mongoose.Schema({
     required: true,
   },
   s3: { 
-    path:{
-    type:String,
-    required:true
-    },
     SaveResultSettings:{
       type: Object,
       required: true,
