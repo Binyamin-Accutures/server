@@ -2,6 +2,12 @@ require("./db").connect();
 const mongoose = require("mongoose");
 
 const projectSchema = new mongoose.Schema({
+
+ root:{ 
+  type:String,
+  required:true
+  ,
+},
   s1: { 
     path:{
     type:String,
@@ -40,6 +46,6 @@ const projectSchema = new mongoose.Schema({
   },
 });
 
-const userData = mongoose.model("user", userSchema);
+const projectData = mongoose.model("project", projectSchema);
 
 module.exports = projectData;
