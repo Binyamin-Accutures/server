@@ -2,6 +2,12 @@ require("./db").connect();
 const mongoose = require("mongoose");
 
 const projectSchema = new mongoose.Schema({
+
+ root:{ 
+  type:String,
+  required:true
+  ,
+},
   s1: { 
     path:{
     type:String,
@@ -23,10 +29,6 @@ const projectSchema = new mongoose.Schema({
     required: true,
   },
   s3: { 
-    path:{
-    type:String,
-    required:true
-    },
     SaveResultSettings:{
       type: Object,
       required: true,
@@ -44,6 +46,6 @@ const projectSchema = new mongoose.Schema({
   },
 });
 
-const userData = mongoose.model("user", userSchema);
+const projectData = mongoose.model("user", projectSchema);
 
-module.exports = userData;
+module.exports = projectData;
