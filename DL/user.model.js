@@ -24,10 +24,10 @@ const userSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
-    projects: {
-    type: Array,
-    default: [{}],
-  },
+    projects:[{
+      type: mongoose.SchemaTypes.ObjectId,
+      ref:"project",
+    }],
   isActive: {
     type: Boolean,
     default: true,

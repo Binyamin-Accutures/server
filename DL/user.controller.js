@@ -8,7 +8,7 @@ async function read(filter) {
   return await userData.find(filter);
 }
 async function findOne(filter) {
-  return await userData.findOne(filter);
+  return await userData.findOne(filter).populate('project');
 }
 
 async function readOne(filter) {
