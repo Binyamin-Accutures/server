@@ -1,5 +1,5 @@
-import projDL from '../DL/project.controller'
-import userDL from '../DL/user.controller'
+const projDL = require ('../DL/project.controller')
+const userDL = require ('../DL/user.controller')
 
 const getFile = async (root) => {
     let proj = await projDL.readOne({root})
@@ -10,7 +10,7 @@ const getFile = async (root) => {
 } 
 
 const createProject = async (email, data) =>{
-    if (!data.root || !data.runIspSettings || email){
+    if (!data.root || !data.runIspSettings || !email){
         throw {code: 400, message : "missing data"}
     }
     let newProj = await projDL.create(data)
@@ -23,7 +23,7 @@ const updateProject = async (data) =>{
         throw {code: 400, message : "missing data"}
     }
     let proj = await projDL.readOne(data)
-    if (!newProj){
+    if (!proj){
         throw {code: 400, message : "no project found"}
     }
     let res = await projDL.update(proj._id, data)
