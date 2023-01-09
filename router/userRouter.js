@@ -34,7 +34,7 @@ userRouter.post('/register',async (req, res,next) => {
         const user = await userService.createUser(req.body);
         console.log(user);
         if(!user) throw {code: 500, message:"can't create user"};
-        res.status(200).send("ok")
+        res.status(200).send(user)
     }
     catch (err) {
         req.errCode = err;
