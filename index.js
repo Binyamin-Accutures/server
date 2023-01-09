@@ -6,8 +6,8 @@ const PORT = process.env.PORT || 3625;
 const mainRouter = require('./router');
 const cors = require('cors');
 
-app.use(cors());
 app.use(express.json());
+app.use(cors());
 
 app.use('/api', mainRouter);
 

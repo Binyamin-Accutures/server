@@ -20,7 +20,8 @@ const login = async (data) => {
     return token
 }
 
-const register = async (data) => {
+const createUser = async (data) => {
+    console.log(data.email);
     let user = await getUser({email : data.email})
     if (user){
         throw {code : 400, message : "user exists"}
@@ -33,13 +34,14 @@ const register = async (data) => {
                     throw {code: 500, message : "bad bcrypt"}}
         data.password = hash;
     });
-    user = await userDL.create({data})
+    console.log({data});
+    user = await userDL.create(data)
     let token = await auth.createToken(data.email)
     return token
 }
 
 const getUser = async (email) => {
-    return await userDL.findOne({email : email})
+    return await userDL.readOne({email : email})
 }
 
 const getFiles = async (email) => {
@@ -52,4 +54,4 @@ const getFiles = async (email) => {
 } 
 
 
-module.exports = { register, getUser, login, getFiles}
+module.exports = { createUser, getUser, login, getFiles}
