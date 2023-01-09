@@ -8,7 +8,7 @@ userRouter.post('/',async (req, res,next) => {
     try {
         const token = await userService.login(req.body);
         if(!token) throw {code: 500, message:"can't crearte token"};
-        res.status(200).send({token})
+        res.send({token})
     }
     catch (err) {
         req.errCode = err;
@@ -32,7 +32,6 @@ userRouter.get('/',auth.validToken, async (req, res,next) => {
 userRouter.post('/register',async (req, res,next) => {
     try {
         const token = await userService.createUser(req.body);
-        console.log(token);
         if(!token) throw {code: 500, message:"can't create user"};
         res.status(200).send(token)
     }
