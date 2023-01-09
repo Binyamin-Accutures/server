@@ -8,12 +8,13 @@ const login = async (data) => {
     if (!data.email || !data.password){
         throw {code : 400, message : "missing data"}
     }
-    
     let user = await getUser(data.email)
     if (!user){
         throw {code: 400, message : "no user found"}
     }
-    if (!bcrypt.compareSync(user.password, data.password)){
+    console.log("user"+user.password +" data"+data.password);
+    const bcrypted =bcrypt.compareSync( data.password,user.password)
+    if (!bcrypted){
         throw {code: 400, message : "worng password is incorrect"}
     }
     let token = await auth.createToken(data.email)
