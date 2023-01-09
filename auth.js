@@ -10,7 +10,7 @@ async function createToken (data){
 
 async function validToken (req, res, next) {
     try{
-        let data = req.headers.authorization;
+        let data = req.headers.authorization.replace('Bearer ', '');
         let result = jwt.verify(data, secret)
         req.send = result.data
         next();
