@@ -4,13 +4,13 @@ const express = require('express');
 const app = express();
 const PORT = process.env.PORT || 3625;
 const mainRouter = require('./router');
-
-app.use('/api', mainRouter);
-
 const cors = require('cors');
+
 app.use(cors());
 app.use(express.json());
 
+app.use('/api', mainRouter);
+
 app.listen(PORT, () => {
-  console.log('connection succsess');
+  console.log('connection succsess' +PORT);
 });

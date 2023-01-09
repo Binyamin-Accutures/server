@@ -5,8 +5,7 @@ const upload = multer({dest:"./uploads"})
 const fs = require('fs');
 const userService = require('../BL/user.service');
 const { errController } = require('../errController');
-const projectService = require('../project.service');
-errController = require('../errController')
+const projectService = require('../BL/project.service');
 
 filesRouter.use('/',express.static('uploads'))
 
@@ -25,7 +24,7 @@ filesRouter.get('/', async (req,res, next)=>{
             req.errCode = err.code
             next()
         }
-},errController())
+},errController)
 
 filesRouter.get('/:dirDate/:dir', upload.array("files"), async (req,res, next)=>{
 try{
@@ -40,7 +39,7 @@ catch(err){
     req.errCode = err.code
     next()
 }
-},errController())
+},errController)
 
 filesRouter.post('/', upload.array("files"), async (req,res, next)=>{
     try{
@@ -66,7 +65,7 @@ filesRouter.post('/', upload.array("files"), async (req,res, next)=>{
         req.errCode = err.code
         next()
     }
-},errController())
+},errController)
 
 filesRouter.put('/',async (req, res, next)=>{
     try{
@@ -78,7 +77,7 @@ filesRouter.put('/',async (req, res, next)=>{
         req.errCode = err.code
         next()
     }
-    },errController())
+    },errController)
 
 module.exports = filesRouter
 
