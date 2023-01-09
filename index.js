@@ -3,7 +3,7 @@ require('./DL/db').connect();
 const express = require('express');
 const app = express();
 const PORT = process.env.PORT || 3625;
-const mainRouter = require('./Routes');
+const mainRouter = require('./router');
 
 app.use('/api', mainRouter);
 
