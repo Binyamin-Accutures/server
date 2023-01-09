@@ -1,11 +1,11 @@
 const express = require('express');
 const filesRouter = express.Router()
 const multer = require(`multer`);
-const auth = require('../auth')
 const upload = multer({dest:"./uploads"})
 const fs = require('fs');
 const userService = require('../BL/user.service');
 const { errController } = require('../errController');
+const projectService = require('../project.service');
 errController = require('../errController')
 
 filesRouter.use('/',express.static('uploads'))
