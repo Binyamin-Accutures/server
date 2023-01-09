@@ -8,6 +8,7 @@ const login = async (data) => {
     if (!data.email || !data.password){
         throw {code : 400, message : "missing data"}
     }
+    
     let user = await getUser(data.email)
     if (!user){
         throw {code: 400, message : "no user found"}
@@ -40,7 +41,7 @@ const getUser = async (email) => {
 }
 
 const getFiles = async (email) => {
-    let user = await getUser({email})
+    let user = await getUser(email)
     if (!user){
         throw {code: 400, message : "no user found"}
     }
