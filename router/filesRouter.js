@@ -46,25 +46,26 @@ catch(err){
 }
 },errController)
 
-filesRouter.post('/', upload.array("files"), async (req,res, next)=>{
+filesRouter.post('/', upload.any("files"), async (req,res, next)=>{
     try{
         const date = new Date()
-        fs.mkdirSync(`./upload/${Number(date)}`)
-        fs.mkdirSync(`./upload/${Number(date)}/original`)
-        fs.mkdirSync(`./upload/${Number(date)}/process`)
+        fs.mkdirSync(`./uploads/${Number(date)}`)
+        fs.mkdirSync(`./uploads/${Number(date)}/original`)
+        fs.mkdirSync(`./uploads/${Number(date)}/process`)
         const files = req.files
-        files.forEach((v)=>{
-            fs.renameSync(`./upload/${v.fileName}`,`./upload/${Number(date)}/original/${v.fileName}`)//missing files ends
-            if(!fs.existsSync(`./upload/original/${v.fileName}`))throw {code:500,message:`can't create file`}
+        files.forEach((v,i)=>{
+            fs.renameSync(`./uploads/${v.filename}`,`./uploads/${Number(date)}/original/${i}.png`)
+            // if(!fs.existsSync(`./uploads/original/${i}`))throw {code:500,message:`can't create file`}
         })
         const processFiles = req.files//api from server
         processFiles.forEach((v)=>{
-            fs.renameSync(`./upload/${v.fileName}`,`./upload/${Number(date)}/process/${v.fileName}`)//missing files ends
-            if(!fs.existsSync(`./upload/process/${v.fileName}`))throw {code:500,message:`can't create file`}
+            fs.renameSync(`./uploads/${v.filename}`,`./uploads/${Number(date)}/process/${i}.png`)
+            // if(!fs.existsSync(`./uploads/process/${i}`))throw {code:500,message:`can't create file`}
         })
-        const isCreated = projectService.createProject({email: req.body.email, root:`./upload/${Number(date)}`,runIspSettings: req.body.runIspSettings,createDate:date})
+        const isCreated = projectService.createProject({email: req.body.email,data:{ root:`./uploads/${Number(date)}`,runIspSettings: req.body,createDate:date}})
+        console.log(isCreated);
         if(!isCreated)throw {code:500,message:`can't create project`}
-        // const urlFiles = fs.readdirSync(`./upload/${Number(date)}/process`)  
+        // const urlFiles = fs.readdirSync(`./uploads/${Number(date)}/process`)  
         res.send({success:true})  
     }
     catch(err){
