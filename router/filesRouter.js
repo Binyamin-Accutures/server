@@ -53,6 +53,7 @@ filesRouter.post('/', upload.any("files"), async (req,res, next)=>{
         fs.mkdirSync(`./uploads/${Number(date)}/original`)
         fs.mkdirSync(`./uploads/${Number(date)}/process`)
         const files = req.files
+        console.log(files)
         files.forEach((v,i)=>{
             fs.renameSync(`./uploads/${v.filename}`,`./uploads/${Number(date)}/original/${i}.png`)
             // if(!fs.existsSync(`./uploads/original/${i}`))throw {code:500,message:`can't create file`}

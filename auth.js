@@ -15,7 +15,7 @@ async function validToken (req, res, next) {
         next();
     } 
     catch(e){
-        throw { code : 401, msg : e.msg}
+        res.status(401).send({ code : 401, msg : e.msg})
     }  
 }
 
