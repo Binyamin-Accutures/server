@@ -3,6 +3,9 @@ import auth from '../auth'
 
 
 const login = async (data) => {
+    if (!data.email || !data.password){
+        throw {code : 400, message : "missing data"}
+    }
     let user = await getUser({email : data.email})
     if (!user){
         throw {code: 400, message : "no user found"}
