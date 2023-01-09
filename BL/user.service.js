@@ -1,6 +1,6 @@
-import userDL from '../DL/user.controller'
-import auth from '../auth'
-const bcrypt = require('bycrypt')
+const userDL =require( '../DL/user.controller')
+const auth =  require('../auth')
+const bcrypt = require('bcrypt')
 
 const saltRounds = 10
 
