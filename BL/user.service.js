@@ -45,7 +45,7 @@ const getUser = async (email) => {
 }
 
 const getFiles = async (email) => {
-    let user = await getUser({email})
+    let user = await getUser(email)
     if (!user){
         throw {code: 400, message : "no user found"}
     }
