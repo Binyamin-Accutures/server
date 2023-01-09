@@ -54,13 +54,18 @@ filesRouter.post('/', upload.any("files"), async (req,res, next)=>{
         fs.mkdirSync(`./uploads/${Number(date)}/process`)
         const files = req.files
         files.forEach((v,i)=>{
+            if(v.mimetype ===`image/png`){
             fs.renameSync(`./uploads/${v.filename}`,`./uploads/${Number(date)}/original/${i}.png`)
-            // if(!fs.existsSync(`./uploads/original/${i}`))throw {code:500,message:`can't create file`}
+            if(!fs.existsSync(`./uploads/${Number(date)}/original/${i}.png`))throw {code:500,message:`can't create file`}
+          }
+          else{
+            fs.unlinkSync(`./uploads/${v.filename}`)
+          }
         })
-        const processFiles = req.files//api from server
-        processFiles.forEach((v)=>{
-            fs.renameSync(`./uploads/${v.filename}`,`./uploads/${Number(date)}/process/${i}.png`)
-            // if(!fs.existsSync(`./uploads/process/${i}`))throw {code:500,message:`can't create file`}
+        //const processFiles = req.files//api from server
+        files.forEach((v,i)=>{
+            fs.copyFileSync(`./uploads/${Number(date)}/original/${i}.png`,`./uploads/${Number(date)}/process/${i}.png`,)
+            if(!fs.existsSync(`./uploads/${Number(date)}/process/${i}.png`))throw {code:500,message:`can't create file`}
         })
         const isCreated = projectService.createProject({email: req.body.email,data:{ root:`./uploads/${Number(date)}`,runIspSettings: req.body,createDate:date}})
         console.log(isCreated);
