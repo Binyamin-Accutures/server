@@ -9,7 +9,7 @@ const login = async (data) => {
         throw {code : 400, message : "missing data"}
     }
     
-    let user = await getUser({email : data.email})
+    let user = await getUser(data.email)
     if (!user){
         throw {code: 400, message : "no user found"}
     }
