@@ -7,7 +7,7 @@ async function creat(data) {
 async function read(filter) {
   return await userData.find(filter);
 }
-async function findOne(filter) {
+async function findUser(filter) {
   return await userData.findOne(filter).populate('project');
 }
 
@@ -23,8 +23,13 @@ async function updateAndReturn(id, newData){
   return data.value
 }
 
+async function addProject(email, data){
+  let user = await findUser(email)
+  user.project.unshift(data);
+}
+
 async function del(id) {
   return await update(id, { isActive: false });
 }
 
-module.exports = { creat, read, update, del, readOne, findOne, updateAndReturn};
+module.exports = { creat, read, update, del, readOne, findUser, updateAndReturn, addProject};

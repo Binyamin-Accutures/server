@@ -39,16 +39,17 @@ const register = async (data) => {
 }
 
 const getUser = async (email) => {
-    await userDL.findOne({email : email})
+    return await userDL.findOne({email : email})
 }
 
-const getFiles = async (data) => {
-    let user = await getUser({email : data.email})
+const getFiles = async (email) => {
+    let user = await getUser({email})
     if (!user){
         throw {code: 400, message : "no user found"}
     }
-    let files = await userDL.findOne({email : data.email})
-    return files.projects
+    return user.projects
+    
 } 
+
 
 module.exports = { register, getUser, login, getFiles}
