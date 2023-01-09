@@ -7,6 +7,8 @@ const fs = require('fs');
 const userData = require('../DL/user.model');
 const userService = require('../BL/user.service');
 const { errController } = require('../errController');
+const { send } = require('process');
+const { response } = require('express');
 errController = require('../errController')
 
 filesRouter.use('/',express.static('uploads'))
@@ -20,7 +22,7 @@ filesRouter.get('/', async (req,res, next)=>{
             return {
                 date:file.pop(),
                 name:file.join("."),
-                
+                path:file.v.root                            
             }})
             res.send(files)
         }
@@ -30,6 +32,33 @@ filesRouter.get('/', async (req,res, next)=>{
         }
 },errController())
 
+
+filesRouter.get('/:path', upload.array("files"), async (req,res, next)=>{
+try{
+    const dirExists = await fs.readdirSync(`./${req.params.path}`)
+    if(!dirExists)throw {code: 404, message: "path not found"}
+    res.send({path: req.params.path})
+}
+catch(err){
+    req.errCode = err.code
+    next()
+}
+},errController())
+
+filesRouter.get('/:path/:dir', upload.array("files"), async (req,res, next)=>{
+try{
+    const fileExists =  fs.readdirSync(`./${req.params.path}/${req.params.dir}`)
+    if(!fileExists)throw {code: 404, message: "path not found"}
+    const files = fileExists.map((v)=>{
+        return {name:v, path:`./${req.params.path}/${req.params.dir}/${v}`}
+    })
+    res.send({files})
+}
+catch(err){
+    req.errCode = err.code
+    next()
+}
+},errController())
 
 filesRouter.post('/', upload.array("files"), async (req,res, next)=>{
 try{
