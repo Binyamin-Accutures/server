@@ -21,8 +21,7 @@ const login = async (data) => {
 }
 
 const createUser = async (data) => {
-    console.log(data.email);
-    let user = await getUser({email : data.email})
+    let user = await getUser( data.email)
     if (user){
         throw {code : 400, message : "user exists"}
     }
@@ -41,7 +40,9 @@ const createUser = async (data) => {
 }
 
 const getUser = async (email) => {
-    return await userDL.readOne({email : email})
+    const check =await userDL.readOne({email : email})
+    if (check.length==0) return null
+    return check
 }
 
 const getFiles = async (email) => {

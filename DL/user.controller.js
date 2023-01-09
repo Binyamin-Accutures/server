@@ -1,7 +1,6 @@
 const userData = require("./user.model");
 
 async function create(data) {
-  console.log(data);
   return await userData.create({email: data.email,password: data.password});
 }
 
@@ -13,7 +12,10 @@ async function findUser(filter) {
 }
 
 async function readOne(filter) {
-  return await read(filter)[0];
+  const check= await read(filter);
+  console.log(check)
+
+  return check
 }
 async function update(id, newData) {
   return await userData.updateOne({ _id: id, newData });
