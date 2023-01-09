@@ -3,9 +3,9 @@ import auth from '../auth'
 
 
 const login = async (data) => {
-    let user = getUser({email : data.email})
+    let user = await getUser({email : data.email})
     if (!user){
-        throw "no user found"
+        throw {code: 400, message : "no user found"}
     }
     /* navigate to register?*/
     /* do the bycrypt */
@@ -14,17 +14,18 @@ const login = async (data) => {
 }
 
 const register = async (data) => {
-    let user = getUser({email : data.email})
+    let user = await getUser({email : data.email})
     if (user){
-        throw "user exists"
+        throw {code : 400, message : "user exists"}
     }
     if (!data.email || !data.password){
-        throw "missing data"
+        throw {code : 400, message : "missing data"}
     }
     user = await userDL.create({data})
     let token = await auth.createToken(data.email)
     return token
 }
+
 const getUser = async (email) => {
     await userDL.findOne({email : email})
 }
