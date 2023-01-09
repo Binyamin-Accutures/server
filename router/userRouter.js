@@ -1,6 +1,6 @@
 const express = require('express');
 const userRouter = express.Router()
-const userService = require('../Bl/user.service');
+const userService = require('../BL/user.service');
 const { errController } = require('../errController');
 const auth = require('../auth');
 
@@ -31,8 +31,9 @@ userRouter.get('/',auth.validToken, async (req, res,next) => {
 
 userRouter.post('/register',async (req, res,next) => {
     try {
-        const user = await userService.creatUser(req.body);
-        if(!user) throw {code: 500, message:"can't crearte user"};
+        const user = await userService.createUser(req.body);
+        console.log(user);
+        if(!user) throw {code: 500, message:"can't create user"};
         res.status(200).send("ok")
     }
     catch (err) {
