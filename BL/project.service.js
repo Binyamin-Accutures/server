@@ -10,6 +10,7 @@ const getFile = async (root) => {
 } 
 
 const createProject = async (email, data) =>{
+    console.log(`email: ${email} ,,, data: ${data}`);
     if (!data.root || !data.runIspSettings || !email){
         throw {code: 400, message : "missing data"}
     }

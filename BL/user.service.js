@@ -37,7 +37,6 @@ const createUser = async (data) => {
 
 const getUser = async (email) => {
     const check =await userDL.readOne({email : email})
-    if (check.length==0) return null
     return check
 }
 
