@@ -12,7 +12,6 @@ const login = async (data) => {
     if (!user){
         throw {code: 400, message : "no user found"}
     }
-    console.log("user"+user.password +" data"+data.password);
     const bcrypted =bcrypt.compareSync( data.password,user.password)
     if (!bcrypted){
         throw {code: 400, message : "worng password is incorrect"}
@@ -31,7 +30,6 @@ const createUser = async (data) => {
     }
     data.password = bcrypt.hashSync(data.password, saltRounds);
     user = await userDL.create(data)
-    console.log("user: " +user)
     let token = await auth.createToken(data.email)
     return token
 }
