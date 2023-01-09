@@ -19,7 +19,7 @@ filesRouter.get('/', async (req,res, next)=>{
     try{
         const filesPath = await userService.getFiles(req.send.email)
         const files = filesPath.map((v)=>{
-            const fileName = v.root.replace("upload/","")
+            const fileName = v.root.replace("uploads/","")
             return {
                 name:fileName                          
             }})
@@ -32,8 +32,9 @@ filesRouter.get('/', async (req,res, next)=>{
 },errController)
 
 filesRouter.get('/:dirDate/:dir', async (req,res, next)=>{
-try{
-    const fileExists =  fs.readdirSync(`./upload/${req.params.dirDate}/${req.params.dir}`)
+    console.log(req.params)
+    try{
+        const fileExists =  fs.readdirSync(`./uploads/${req.params.dirDate}/${req.params.dir}`)
     if(!fileExists)throw {code: 404, message: "path not found"}
     const files = fileExists.map((v)=>{
         return {name:v, path:`./${req.params.path}/${req.params.dir}/${v}`}
@@ -82,7 +83,7 @@ filesRouter.post('/', upload.any("files"), async (req,res, next)=>{
 
 filesRouter.put('/',async (req, res, next)=>{
     try{
-        const isUpdate = await projectService.updateProject(`./upload/${req.body.folder}`,req.body.saveSettings)
+        const isUpdate = await projectService.updateProject(`./uploads/${req.body.folder}`,req.body.saveSettings)
         if(!isUpdate)throw {code:500,message:`can't update project`}
         res.send({success:true})
     }
