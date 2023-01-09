@@ -4,11 +4,8 @@ const multer = require(`multer`);
 const auth = require('../auth')
 const upload = multer({dest:"./uploads"})
 const fs = require('fs');
-const userData = require('../DL/user.model');
 const userService = require('../BL/user.service');
 const { errController } = require('../errController');
-const { send } = require('process');
-const { response } = require('express');
 errController = require('../errController')
 
 filesRouter.use('/',express.static('uploads'))
@@ -61,15 +58,14 @@ catch(err){
 },errController())
 
 filesRouter.post('/', upload.array("files"), async (req,res, next)=>{
-try{
+    try{
+        fs.
+        const files = req.files.map
+        projectService.createProject({fileName,s1:{leftBar},})    
+    }
+    catch(err){
 
-}
-
-catch(err){
-
-}
-
-
+    }
 },errController())
 
 
