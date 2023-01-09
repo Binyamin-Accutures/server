@@ -8,7 +8,7 @@ userRouter.post('/',async (req, res,next) => {
     try {
         const token = await userService.login(req.body);
         if(!token) throw {code: 500, message:"can't crearte token"};
-        res.status(200).send({token})
+        res.send({token})
     }
     catch (err) {
         req.errCode = err;
@@ -34,7 +34,7 @@ userRouter.post('/register',async (req, res,next) => {
         const user = await userService.createUser(req.body);
         console.log(user);
         if(!user) throw {code: 500, message:"can't create user"};
-        res.status(200).send(user)
+        res.status(200).send("ok")
     }
     catch (err) {
         req.errCode = err;

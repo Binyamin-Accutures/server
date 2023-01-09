@@ -13,9 +13,7 @@ async function findUser(filter) {
 
 async function readOne(filter) {
   const check= await read(filter);
-  console.log(check)
-
-  return check
+  return check[0]
 }
 async function update(id, newData) {
   return await userData.updateOne({ _id: id, newData });
