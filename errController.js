@@ -2,16 +2,13 @@
 
 const errController = async(req,res)=>{
     try{
-        if(!req.errCode) throw "missing error"
+        if(!req.errCode) throw {message:"missing error"}
     }
     catch(e){
-        res.status(500).send(e)
+        res.status(500).send(e.message)
         return;
     }
-    finally{
-        res.status(req.errCode.code).send(req.errCode.message)
-    }
-
+    res.status(req.errCode.code).send(req.errCode.message)
 }
 
 module.exports = {
