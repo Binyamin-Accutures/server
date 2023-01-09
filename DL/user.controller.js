@@ -1,7 +1,8 @@
 const userData = require("./user.model");
 
-async function creat(data) {
-  return await userData.create(data);
+async function create(data) {
+  console.log(data);
+  return await userData.create({email: data.email,password: data.password});
 }
 
 async function read(filter) {
@@ -32,4 +33,4 @@ async function del(id) {
   return await update(id, { isActive: false });
 }
 
-module.exports = { creat, read, update, del, readOne, findUser, updateAndReturn, addProject};
+module.exports = { create, read, update, del, readOne, findUser, updateAndReturn, addProject};
