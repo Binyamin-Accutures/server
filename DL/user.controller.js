@@ -1,8 +1,9 @@
 const userData = require("./user.model");
 
 async function create(data) {
-  console.log(data);
-  return await userData.create({email: data.email,password: data.password});
+  const res =  await userData.create({email: data.email,password: data.password});
+  console.log(res);
+  return res
 }
 
 async function read(filter) {
