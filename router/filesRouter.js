@@ -15,11 +15,9 @@ filesRouter.get('/', async (req,res, next)=>{
     try{
         const filesPath = await userService.getFiles(req.send.email)
         const files = filesPath.map((v)=>{
-            const file = v.root.replace("upload/","").split(".")
+            const fileName = v.root.replace("upload/","")
             return {
-                date:file.pop(),
-                name:file.join("."),
-                path:file.v.root                            
+                name:fileName                          
             }})
             res.send(files)
         }
@@ -29,22 +27,9 @@ filesRouter.get('/', async (req,res, next)=>{
         }
 },errController())
 
-
-filesRouter.get('/:path', upload.array("files"), async (req,res, next)=>{
+filesRouter.get('/:dirDate/:dir', upload.array("files"), async (req,res, next)=>{
 try{
-    const dirExists = await fs.readdirSync(`./${req.params.path}`)
-    if(!dirExists)throw {code: 404, message: "path not found"}
-    res.send({path: req.params.path})
-}
-catch(err){
-    req.errCode = err.code
-    next()
-}
-},errController())
-
-filesRouter.get('/:path/:dir', upload.array("files"), async (req,res, next)=>{
-try{
-    const fileExists =  fs.readdirSync(`./${req.params.path}/${req.params.dir}`)
+    const fileExists =  fs.readdirSync(`./upload/${req.params.dirDate}/${req.params.dir}`)
     if(!fileExists)throw {code: 404, message: "path not found"}
     const files = fileExists.map((v)=>{
         return {name:v, path:`./${req.params.path}/${req.params.dir}/${v}`}
@@ -59,26 +44,40 @@ catch(err){
 
 filesRouter.post('/', upload.array("files"), async (req,res, next)=>{
     try{
-        fs.
-        const files = req.files.map
-        projectService.createProject({fileName,s1:{leftBar},})    
+        const date = new Date()
+        fs.mkdirSync(`./upload/${Number(date)}`)
+        fs.mkdirSync(`./upload/${Number(date)}/original`)
+        fs.mkdirSync(`./upload/${Number(date)}/process`)
+        const files = req.files
+        files.forEach((v)=>{
+            fs.renameSync(`./upload/${v.fileName}`,`./upload/${Number(date)}/original/${v.fileName}`)//missing files ends
+            if(!fs.existsSync(`./upload/original/${v.fileName}`))throw {code:500,message:`can't create file`}
+        })
+        const processFiles = req.files//api from server
+        processFiles.forEach((v)=>{
+            fs.renameSync(`./upload/${v.fileName}`,`./upload/${Number(date)}/process/${v.fileName}`)//missing files ends
+            if(!fs.existsSync(`./upload/process/${v.fileName}`))throw {code:500,message:`can't create file`}
+        })
+        const isCreated = projectService.createProject({email: req.body.email, root:`./upload/${Number(date)}`,runIspSettings: req.body.runIspSettings,createDate:date})
+        if(!isCreated)throw {code:500,message:`can't create project`}  
+        res.send({success:true})  
     }
     catch(err){
-
+        req.errCode = err.code
+        next()
     }
 },errController())
 
-
-filesRouter.put('/:filename',auth.verifyToken,(req, res, next)=>{
+filesRouter.put('/',async (req, res, next)=>{
     try{
-
+        const isUpdate = await projectService.updateProject(`./upload/${req.body.folder}`,req.body.saveSettings)
+        if(!isUpdate)throw {code:500,message:`can't update project`}
+        res.send({success:true})
     }
-    
     catch(err){
-    
+        req.errCode = err.code
+        next()
     }
-    
-    
     },errController())
 
 module.exports = filesRouter
