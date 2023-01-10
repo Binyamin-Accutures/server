@@ -24,12 +24,15 @@ userRouter.get('/',auth.validToken, async (req, res) => {
     }
 })
 
+
 userRouter.post('/register',async (req, res) => {
     try {
         const user = await userService.createUser(req.body);
+        console.log(user);
         res.status(200).send(user)
     }
     catch (err) {
+        console.log(err);
         res.status(err.code).send(err.message);
     }
 })
