@@ -2,6 +2,7 @@ const userDL =require( '../DL/user.controller')
 const auth =  require('../auth')
 const bcrypt = require('bcrypt')
 
+
 const saltRounds = 10
 
 const login = async (data) => {
@@ -22,23 +23,16 @@ const login = async (data) => {
 }
 
 const createUser = async (data) => {
-
-    let user = await getUser( data.email) 
+    let user = await getUser( data.email)
     if (user){
         throw {code : 400, message : "user exists"}
     }
-    if (!data.email || !data.firstPassword || !data.secondPassword){
+    if (!data.email || !data.password){
         throw {code : 400, message : "missing data"}
     }
-    if (data.firstPassword !== data.secondPassword){
-        throw {code : 400, message : "missing data"}
-    }
-    data.firstPassword = bcrypt.hashSync(data.firstPassword, saltRounds);
-
-    user = await userDL.create(data);
-
-    let token = await auth.createToken(data.email);
-
+    data.password = bcrypt.hashSync(data.password, saltRounds);
+    user = await userDL.create(data)
+    let token = await auth.createToken(data.email)
     return token
 }
 
@@ -47,12 +41,14 @@ const getUser = async (email) => {
     return check
 }
 
-const getFiles = async (email) => {
+const getUserDirectories = async (email) => {
     let user = await getUser(email)
-    if (!user){
-        throw {code: 400, message : "no user found"}
-    }
-    return user.projects
+    const directories = user.projects.map((v)=>{
+        let dirName = projectService.getDirName(v.root)
+        return {
+            name:dirName                          
+        }})
+        return directories
 } 
 
 const addProject = async(user_id, project)=>{
@@ -61,4 +57,4 @@ const addProject = async(user_id, project)=>{
   }
 
 
-module.exports = { createUser, getUser, login, getFiles,addProject}
+module.exports = { createUser, getUser, login, getUserDirectories,addProject}

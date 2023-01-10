@@ -4,7 +4,6 @@ const multer = require(`multer`);
 const upload = multer({dest:"./upload"})
 const fs = require('fs');
 const userService = require('../BL/user.service');
-const { errController } = require('../errController');
 const projectService = require('../BL/project.service');
 const urlImags = ["https://cdn.pixabay.com/photo/2023/01/05/22/36/ai-generated-7700016__340.png",
 "https://cdn.pixabay.com/photo/2015/10/01/17/17/car-967387__340.png",
@@ -15,21 +14,15 @@ const urlImags = ["https://cdn.pixabay.com/photo/2023/01/05/22/36/ai-generated-7
 filesRouter.use('/',express.static('upload'))
 
 
-filesRouter.get('/', async (req,res, next)=>{
+filesRouter.get('/', async (req,res)=>{
     try{
-        const filesPath = await userService.getFiles(req.send)
-        const files = filesPath.map((v)=>{
-            const fileName = v.root.replace("./upload/","")
-            return {
-                name:fileName                          
-            }})
+        const filesPath = await userService.getUserDirectories(req.send)
             res.send(files)
         }
         catch(err){
-            req.errCode = err
-            next()
+            res.send(err)
         }
-},errController)
+})
 
 filesRouter.get('/:dirDate/:dir', async (req,res, next)=>{
 try{
@@ -50,7 +43,6 @@ catch(err){
 filesRouter.post('/', upload.any("files"), async (req,res, next)=>{
     try{
         const user = await userService.getUser(req.body.email)
-        if(!user) throw {code:400,message: "user not found"}
         const date = new Date()
         fs.mkdirSync(`./upload/${Number(date)}`)
         fs.mkdirSync(`./upload/${Number(date)}/original`)
