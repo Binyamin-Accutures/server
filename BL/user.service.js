@@ -47,8 +47,14 @@ const getFiles = async (email) => {
         throw {code: 400, message : "no user found"}
     }
     return user.projects
-    
 } 
 
+const addProject = async(email, project)=>{
+    let user = await getUser(email)
+    if(!user) throw {code:400,message:"user not found"}
+    const updateRes = await userDL.updateAndReturn(user._id,{$push:{projects:project._id}})
+    return updateRes
+  }
 
-module.exports = { createUser, getUser, login, getFiles}
+
+module.exports = { createUser, getUser, login, getFiles,addProject}
