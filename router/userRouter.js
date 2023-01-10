@@ -4,29 +4,25 @@ const userService = require('../BL/user.service');
 const { errController } = require('../errController');
 const auth = require('../auth');
 
-userRouter.post('/',async (req, res,next) => {
+userRouter.post('/',async (req, res) => {
     try {
         const token = await userService.login(req.body);
-        if(!token) throw {code: 500, message:"can't crearte token"};
         res.send({token})
     }
     catch (err) {
-        res.send(errControler(err))
+        res.status(err.code).send(err.message);
     }
 })
 
-userRouter.get('/',auth.validToken, async (req, res,next) => {
+userRouter.get('/',auth.validToken, async (req, res) => {
     try {
-        if(!req.send) throw {code: 500, message:"token can't be valid"};
-        const user = await userService.getUser(req.body.email);
-        if(!user) throw {code: 500, message:"can't crearte token"};
+        const user = await userService.getUser(req.email);
         res.status(200).send({user})
     }
     catch (err) {
-        req.errCode = err;
-        next()
+        res.status(err.code).send(err.message);
     }
-},errController)
+})
 
 userRouter.post('/register',async (req, res) => {
     try {
@@ -34,9 +30,9 @@ userRouter.post('/register',async (req, res) => {
         res.status(200).send(user)
     }
     catch (err) {
-        res.send(err)
+        res.status(err.code).send(err.message);
     }
-},errController)
+})
 
 
 module.exports = userRouter
