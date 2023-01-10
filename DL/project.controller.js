@@ -1,3 +1,5 @@
+const { error } = require("console");
+const { errMessage } = require("../errController");
 const projectData = require("./project.model");
 
 async function create(data) {
@@ -8,7 +10,9 @@ async function read(filter) {
   return await projectData.find(filter);
 }
 async function readOne(filter) {
-  return await projectData.findOne(filter)
+  const res =await projectData.findOne(filter)
+  if(!res) throw errMessage.PROJECT_NOT_FOUND
+  return res
 }
 
 async function update(id, newData) {
@@ -17,6 +21,7 @@ async function update(id, newData) {
 
 async function updateAndReturn(id, newData){
   let data = await projectData.findOneAndUpdate({ _id: id}, newData,{new:true})
+  if(!data) throw errMessage.PROJECT_NOT_FOUND
   return data
 }
 
