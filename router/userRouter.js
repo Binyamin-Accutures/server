@@ -5,6 +5,7 @@ const { errController } = require('../errController');
 const auth = require('../auth');
 
 userRouter.post('/',async (req, res,next) => {
+    
     try {
         const token = await userService.login(req.body);
         if(!token) throw {code: 500, message:"can't crearte token"};
@@ -30,6 +31,7 @@ userRouter.get('/',auth.validToken, async (req, res,next) => {
 },errController)
 
 userRouter.post('/register',async (req, res ,next) => {
+
     try {
         const user = await userService.createUser(req.body);
         if(!user) throw {code: 500, message:"can't create user"};
