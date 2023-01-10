@@ -4,12 +4,15 @@ const bcrypt = require('bcrypt')
 const {checkData} = require('../checkController')
 const { errMessage } = require('../errController')
 
-const saltRounds = process.env.SALT_ROUN;
+const saltRounds = Number(process.env.SALT_ROUN)||10
 
 const login = async (data) => {
-    checkData(data,['email', 'password'])
-    let user = await getUser(data.email)
+  checkData(data,['email', 'password'])
+  let user = await getUser(data.email)
+  console.log(user)
+  console.log(data)
     const bcrypted =bcrypt.compareSync( data.password,user.password)
+    console.log(bcrypted)
     if (!bcrypted) throw errMessage.WRONG_PASSWORD
     let token = await auth.createToken(data.email)
     return token
@@ -20,7 +23,7 @@ const createUser = async (data) => {
   if(data.firstPassword!==data.secondPassword) throw errMessage.PASSWORDS_ARE_NOT_EQUAL
     let user = await userDL.findUser( {email:data.email})
     if(user) throw errMessage.USER_ALREADY_REGISTERED
-    data.password = bcrypt.hashSync(data.firstPassword, saltRounds);
+    data.firstPassword = bcrypt.hashSync(data.firstPassword, saltRounds);
     user = await userDL.create(data)
     let token = await auth.createToken(data.email)
     return token
