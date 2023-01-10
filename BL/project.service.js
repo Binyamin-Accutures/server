@@ -37,5 +37,8 @@ const updateProject = async (root,saveSettings) =>{
     }
 }
 
+const getDirName = (path)=>{
+    return path.replace("./upload/","")
+}
 
-module.exports = { getFile, createProject, updateProject}
+module.exports = { getFile, createProject, updateProject,getDirName}
