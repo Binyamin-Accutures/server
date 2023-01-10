@@ -1,4 +1,4 @@
-const { log } = require('console')
+
 const projDL = require ('../DL/project.controller')
 const userService = require ('./user.service')
 
@@ -10,12 +10,12 @@ const getFile = async (root) => {
     return proj
 } 
 
-const createProject = async (email, data) =>{
-    if (!data.root || !data.runIspSettings || !email){
+const createProject = async (user_id, data) =>{
+    if (!data.root || !data.runIspSettings || !user_id){
         throw {code: 400, message : "missing data"}
     }
     let newProj = await projDL.create(data)
-    let res = await userService.addProject(email, newProj)
+    let res = await userService.addProject(user_id, newProj)
     return true
 }
 
@@ -27,13 +27,13 @@ const updateProject = async (root,saveSettings) =>{
         }
         let proj = await projDL.readOne({root})
         if (!proj){
-                throw {code: 400, message : "no project found"}
+            throw {code: 400, message : "no project found"}
         }
         let res = await projDL.updateAndReturn(proj._id, {saveSettings})
         return res
     }
     catch(e){
-        throw {code: 500, message : e.message}
+        throw e
     }
 }
 
