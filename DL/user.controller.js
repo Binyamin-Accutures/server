@@ -12,12 +12,9 @@ async function findUser(filter) {
   return await userData.findOne(filter).populate('projects');
 }
 
-async function readOne(filter) {
-  const check= await read(filter);
-  return check[0]
-}
+
 async function update(id, newData) {
-  return await userData.updateOne({ _id: id}, newData );
+  return await userData.updateOne({ _id: id}, newData,{new:true}).populate("projects")
 }
 
 async function updateAndReturn(id, newData){
