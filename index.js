@@ -31,18 +31,6 @@ const swaggerOptions = {
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
-/**
- * @swagger
- * /use:
- *  get:
- *    description: Use to get user information
- *    responses:
- *      '200':
- *        description: return user information  
- */
-app.get('/use',(req,res) => {
-  res.status(200).send("seccess")
-})
 
 app.use('/api', mainRouter);
 app.use('/',express.static('upload'))
