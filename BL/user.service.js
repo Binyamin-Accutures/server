@@ -1,7 +1,6 @@
 const userDL =require( '../DL/user.controller')
 const auth =  require('../auth')
 const bcrypt = require('bcrypt')
-const { log } = require('console')
 
 const saltRounds = 10
 
@@ -49,10 +48,8 @@ const getFiles = async (email) => {
     return user.projects
 } 
 
-const addProject = async(email, project)=>{
-    let user = await getUser(email)
-    if(!user) throw {code:400,message:"user not found"}
-    const updateRes = await userDL.updateAndReturn(user._id,{$push:{projects:project._id}})
+const addProject = async(user_id, project)=>{
+    const updateRes = await userDL.updateAndReturn(user_id,{$push:{projects:project._id}})
     return updateRes
   }
 
