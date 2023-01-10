@@ -4,7 +4,7 @@ const bcrypt = require('bcrypt')
 const {checkData} = require('../checkController')
 const { errMessage } = require('../errController')
 
-const saltRounds = process.env.SALT_ROUN;
+const saltRounds = process.env.SALT_ROUNDS;
 
 const login = async (data) => {
     checkData(data,['email', 'password'])
