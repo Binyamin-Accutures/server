@@ -1,4 +1,6 @@
 const mongoose = require("mongoose");
+require("./project.model")
+
 
 const userSchema = new mongoose.Schema({
   email: {
@@ -16,8 +18,8 @@ const userSchema = new mongoose.Schema({
     default: Date.now,
   },
     projects:[{
-      type: mongoose.SchemaTypes.ObjectId,
-      ref:"project",
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "project",
     }],
   isActive: {
     type: Boolean,

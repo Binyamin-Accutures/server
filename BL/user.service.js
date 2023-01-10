@@ -1,6 +1,7 @@
 const userDL =require( '../DL/user.controller')
 const auth =  require('../auth')
 const bcrypt = require('bcrypt')
+const { log } = require('console')
 
 const saltRounds = 10
 
