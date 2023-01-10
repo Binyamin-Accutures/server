@@ -10,7 +10,8 @@ app.use(express.json());
 app.use(cors());
 
 app.use('/api', mainRouter);
+app.use('/',express.static('upload'))
 
 app.listen(PORT, () => {
-  console.log('connection succsess' +PORT);
+  console.log('server listen to ' +PORT);
 });

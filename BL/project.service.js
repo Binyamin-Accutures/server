@@ -1,41 +1,29 @@
-
+const { checkData } = require('../checkController')
 const projDL = require ('../DL/project.controller')
+const { errMessage } = require('../errController')
 const userService = require ('./user.service')
 
 const getFile = async (root) => {
-    let proj = await projDL.readOne({root})
-    if (!proj){
-        throw {code: 400, message : "no project found"}
-    }
-    return proj
+    const project = await projDL.readOne({root})
+    return project
 } 
 
 const createProject = async (user_id, data) =>{
-    if (!data.root || !data.runIspSettings || !user_id){
-        throw {code: 400, message : "missing data"}
-    }
-    let newProj = await projDL.create(data)
-    let res = await userService.addProject(user_id, newProj)
-    return true
+    checkData({user_id,...data},["root", "runIspSettings"])
+    const newProject = await projDL.create(data)
+    const res = await userService.addProject(user_id, newProject)
+    return errMessage.SUCCESS
 }
 
 const updateProject = async (root,saveSettings) =>{
-    try{
-
-        if (!root || !saveSettings){
-            throw {code: 400, message : "missing data"}
-        }
-        let proj = await projDL.readOne({root})
-        if (!proj){
-            throw {code: 400, message : "no project found"}
-        }
-        let res = await projDL.updateAndReturn(proj._id, {saveSettings})
-        return res
-    }
-    catch(e){
-        throw e
-    }
+    checkData({root:root,saveSettings:saveSettings},["root","saveSettings"])
+    const project = await projDL.readOne({root})
+    const res = await projDL.updateAndReturn(project._id, {saveSettings})
+    return res
 }
 
+const getDirName = (path)=>{
+    return path.replace("./upload/","")
+}
 
-module.exports = { getFile, createProject, updateProject}
+module.exports = { getFile, createProject, updateProject,getDirName}
