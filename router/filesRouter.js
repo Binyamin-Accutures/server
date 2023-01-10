@@ -17,7 +17,8 @@ filesRouter.use('/',express.static('uploads'))
 
 filesRouter.get('/', async (req,res, next)=>{
     try{
-        const filesPath = await userService.getFiles(req.send.email)
+        const filesPath = await userService.getFiles(req.body.email)
+        console.log(filesPath)
         const files = filesPath.map((v)=>{
             const fileName = v.root.replace("uploads/","")
             return {
