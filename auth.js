@@ -6,7 +6,7 @@ const secret = process.env.SECRET
 async function createToken (data){
     const token = jwt.sign({data}, secret, {expiresIn : '1d'})
     if (!token) throw errMessage.TOKEN_DID_NOT_CREATED
-    return 
+    return token
 
 }
 
