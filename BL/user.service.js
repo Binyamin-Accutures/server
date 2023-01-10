@@ -22,16 +22,23 @@ const login = async (data) => {
 }
 
 const createUser = async (data) => {
-    let user = await getUser( data.email)
+
+    let user = await getUser( data.email) 
     if (user){
         throw {code : 400, message : "user exists"}
     }
-    if (!data.email || !data.password){
+    if (!data.email || !data.firstPassword || !data.secondPassword){
         throw {code : 400, message : "missing data"}
     }
-    data.password = bcrypt.hashSync(data.password, saltRounds);
-    user = await userDL.create(data)
-    let token = await auth.createToken(data.email)
+    if (data.firstPassword !== data.secondPassword){
+        throw {code : 400, message : "missing data"}
+    }
+    data.firstPassword = bcrypt.hashSync(data.firstPassword, saltRounds);
+
+    user = await userDL.create(data);
+
+    let token = await auth.createToken(data.email);
+
     return token
 }
 
