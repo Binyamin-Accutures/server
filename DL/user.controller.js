@@ -26,4 +26,4 @@ async function del(id) {
   return await update(id, { isActive: false });
 }
 
-module.exports = { create, read, update, del, readOne, findUser, updateAndReturn};
+module.exports = { create, read, update, del, findUser, updateAndReturn};
