@@ -1,3 +1,5 @@
+const { error } = require("console");
+const { errMessage } = require("../errController");
 const userData = require("./user.model");
 
 
@@ -19,6 +21,7 @@ async function update(id, newData) {
 
 async function updateAndReturn(id, newData){
   let data = await userData.findOneAndUpdate({ _id: id},newData,{new:true}).populate("projects")
+  if(!data) throw errMessage.USER_NOT_FOUND
   return data
 }
 
