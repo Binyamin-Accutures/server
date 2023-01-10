@@ -9,7 +9,10 @@ const getFile = async (root) => {
 } 
 
 const createProject = async (user_id, data) =>{
-    checkData({user_id,...data},["root", "runIspSettings"])
+
+    // checkData({user_id,...data},["root", "runIspSettings"])
+    console.log ("********* im stil here*******")
+
     const newProject = await projDL.create(data)
     const res = await userService.addProject(user_id, newProject)
     return errMessage.SUCCESS
