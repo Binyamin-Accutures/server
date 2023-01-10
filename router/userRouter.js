@@ -14,7 +14,6 @@ userRouter.post('/login',async (req, res) => {
 })
 
 userRouter.get('/',auth.validToken, async (req, res) => {
-    console.log(req.headers);
     try {
         const user = await userService.getUser(req.email);
         res.status(200).send(user)

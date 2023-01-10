@@ -1,11 +1,10 @@
-
 const userDL =require( '../DL/user.controller')
 const auth =  require('../auth')
 const bcrypt = require('bcrypt')
 const {checkData} = require('../checkController')
 const { errMessage } = require('../errController')
 
-const saltRounds = 10;
+const saltRounds = process.env.SALT_ROUN;
 
 const login = async (data) => {
     checkData(data,['email', 'password'])
