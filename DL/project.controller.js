@@ -1,4 +1,4 @@
-const projectData = require("./project.controller");
+const projectData = require("./project.model");
 
 async function create(data) {
   return await projectData.create(data);
@@ -12,12 +12,12 @@ async function readOne(filter) {
 }
 
 async function update(id, newData) {
-  return await projectData.updateOne({ _id: id, newData });
+  return await projectData.updateOne({ _id: id}, newData);
 }
 
 async function updateAndReturn(id, newData){
-  let data = await projectData.findOneAndUpdate({ _id: id, newData})
-  return data.value
+  let data = await projectData.findOneAndUpdate({ _id: id}, newData,{new:true})
+  return data
 }
 
 async function del(id) {
