@@ -18,10 +18,11 @@ const errMessage = Object.freeze({
     SUCCESS:{code: 200,message: "success"},
     UNAUTHORIZED:{code: 401,message: "you need to login first"},
     WORNG_PASSWORD:{code: 400,message: "password is not correct"},
+    PASSWORDS_ARE_NOT_EQUAL:{code: 400,message: "passwords are not equal"},
 
 })
 
 module.exports = {
     errController,
-    errCreate
+    errMessage
 }

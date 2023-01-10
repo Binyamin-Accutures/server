@@ -16,15 +16,15 @@ filesRouter.use('/',express.static('upload'))
 
 filesRouter.get('/', async (req,res)=>{
     try{
-        const filesPath = await userService.getUserDirectories(req.send)
-            res.send(files)
+        const dirPath = await userService.getUserDirectories(req.send)
+            res.send(dirPath)
         }
         catch(err){
             res.send(err)
         }
 })
 
-filesRouter.get('/:dirDate/:dir', async (req,res, next)=>{
+filesRouter.get('/:dirDate/:dir', upload.array("files"), async (req,res, next)=>{
 try{
     if(!fs.existsSync(`./upload/${req.params.dirDate}/${req.params.dir}`)) throw {code: 404, message: "path not found"}
     const dir =  fs.readdirSync(`./upload/${req.params.dirDate}/${req.params.dir}`)
@@ -70,6 +70,7 @@ filesRouter.post('/', upload.any("files"), async (req,res, next)=>{
             return `/api/files/upload/${req.params.dirDate}/${req.params.dir}/${v}`
         })
         res.send({urlFiles})  
+
     }
     catch(err){
         req.errCode = err
@@ -90,8 +91,5 @@ filesRouter.put('/',async (req, res, next)=>{
     },errController)
 
 module.exports = filesRouter
-
-
-
 
 
