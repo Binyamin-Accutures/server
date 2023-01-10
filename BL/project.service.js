@@ -1,5 +1,6 @@
+const { log } = require('console')
 const projDL = require ('../DL/project.controller')
-const userDL = require ('../DL/user.controller')
+const userService = require ('./user.service')
 
 const getFile = async (root) => {
     let proj = await projDL.readOne({root})
@@ -14,20 +15,26 @@ const createProject = async (email, data) =>{
         throw {code: 400, message : "missing data"}
     }
     let newProj = await projDL.create(data)
-    //adding the mongo id to the projects array in the user
-    let res = await userDL.addProject(email, newProj._id)
+    let res = await userService.addProject(email, newProj)
+    return true
 }
 
-const updateProject = async (data) =>{
-    if (!data.root || !data.runIspSettings){
-        throw {code: 400, message : "missing data"}
+const updateProject = async (root,saveSettings) =>{
+    try{
+
+        if (!root || !saveSettings){
+            throw {code: 400, message : "missing data"}
+        }
+        let proj = await projDL.readOne({root})
+        if (!proj){
+                throw {code: 400, message : "no project found"}
+        }
+        let res = await projDL.updateAndReturn(proj._id, {saveSettings})
+        return res
     }
-    let proj = await projDL.readOne(data)
-    if (!proj){
-        throw {code: 400, message : "no project found"}
+    catch(e){
+        throw {code: 500, message : e.message}
     }
-    let res = await projDL.update(proj._id, data)
-    return res
 }
 
 

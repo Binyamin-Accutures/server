@@ -1,6 +1,7 @@
 const userDL =require( '../DL/user.controller')
 const auth =  require('../auth')
 const bcrypt = require('bcrypt')
+const { log } = require('console')
 
 const saltRounds = 10
 
@@ -37,7 +38,6 @@ const createUser = async (data) => {
 
 const getUser = async (email) => {
     const check =await userDL.readOne({email : email})
-    if (check.length==0) return null
     return check
 }
 
@@ -47,8 +47,14 @@ const getFiles = async (email) => {
         throw {code: 400, message : "no user found"}
     }
     return user.projects
-    
 } 
 
+const addProject = async(email, project)=>{
+    let user = await getUser(email)
+    if(!user) throw {code:400,message:"user not found"}
+    const updateRes = await userDL.updateAndReturn(user._id,{$push:{projects:project._id}})
+    return updateRes
+  }
 
-module.exports = { createUser, getUser, login, getFiles}
+
+module.exports = { createUser, getUser, login, getFiles,addProject}
