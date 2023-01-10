@@ -1,16 +1,15 @@
 const express = require('express');
 const userRouter = express.Router()
 const userService = require('../BL/user.service');
-const { errController } = require('../errController');
 const auth = require('../auth');
 
-userRouter.post('/',async (req, res) => {
+userRouter.post('/login',async (req, res) => {
     try {
         const token = await userService.login(req.body);
-        res.send({token})
+        res.send(token)
     }
     catch (err) {
-        res.status(err.code).send(err.message);
+        sendError(res,err)
     }
 })
 
@@ -21,7 +20,7 @@ userRouter.get('/',auth.validToken, async (req, res) => {
         res.status(200).send(user)
     }
     catch (err) {
-        res.status(err.code).send(err.message);
+        sendError(res,err)
     }
 })
 
@@ -33,8 +32,7 @@ userRouter.post('/register',async (req, res) => {
         res.status(200).send(user)
     }
     catch (err) {
-        console.log(err);
-        res.status(err.code).send(err.message);
+        sendError(res,err)
     }
 })
 
