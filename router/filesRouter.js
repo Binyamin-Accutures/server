@@ -21,7 +21,7 @@ filesRouter.get('/', async (req,res, next)=>{
         const files = filesPath.map((v)=>{
             const fileName = v.root.replace("upload/","")
             return {
-                name:filename                          
+                name: fileName                          
             }})
             res.send(files)
         }
