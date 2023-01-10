@@ -15,9 +15,10 @@ userRouter.post('/',async (req, res) => {
 })
 
 userRouter.get('/',auth.validToken, async (req, res) => {
+    console.log(req.headers);
     try {
         const user = await userService.getUser(req.email);
-        res.status(200).send({user})
+        res.status(200).send(user)
     }
     catch (err) {
         res.status(err.code).send(err.message);
