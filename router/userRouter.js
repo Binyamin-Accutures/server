@@ -11,10 +11,9 @@ userRouter.post('/',async (req, res,next) => {
         res.send({token})
     }
     catch (err) {
-        req.errCode = err;
-        next()
+        res.send(errControler(err))
     }
-},errController)
+})
 
 userRouter.get('/',auth.validToken, async (req, res,next) => {
     try {
@@ -29,16 +28,13 @@ userRouter.get('/',auth.validToken, async (req, res,next) => {
     }
 },errController)
 
-userRouter.post('/register',async (req, res ,next) => {
+userRouter.post('/register',async (req, res) => {
     try {
         const user = await userService.createUser(req.body);
-        if(!user) throw {code: 500, message:"can't create user"};
         res.status(200).send(user)
     }
     catch (err) {
-        console.log(err);
-        req.errCode = err;
-        next()
+        res.send(err)
     }
 },errController)
 
