@@ -1,6 +1,6 @@
 const { log } = require('console')
 const projDL = require ('../DL/project.controller')
-const userDL = require ('../DL/user.controller')
+const userService = require ('./user.service')
 
 const getFile = async (root) => {
     let proj = await projDL.readOne({root})
@@ -15,7 +15,7 @@ const createProject = async (email, data) =>{
         throw {code: 400, message : "missing data"}
     }
     let newProj = await projDL.create(data)
-    let res = await userDL.addProject(email, newProj)
+    let res = await userService.addProject(email, newProj)
     return true
 }
 

@@ -25,15 +25,8 @@ async function updateAndReturn(id, newData){
   return data
 }
 
-async function addProject(email, project){
-  let user = await findUser({email})
-  if(!user) throw {code:400,message:"user not found"}
-  const updateRes = await updateAndReturn(user._id,{$push:{projects:project._id}})
-  return updateRes
-}
-
 async function del(id) {
   return await update(id, { isActive: false });
 }
 
-module.exports = { create, read, update, del, readOne, findUser, updateAndReturn, addProject};
+module.exports = { create, read, update, del, readOne, findUser, updateAndReturn};
