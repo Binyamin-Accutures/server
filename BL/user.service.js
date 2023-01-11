@@ -31,7 +31,7 @@ const createUser = async (data) => {
 }
 
 const getUser = async (email) => {
-  const user = await userDL.findUser({email : email})
+  const user = await userDL.findUserWithPass({email : email})
     if (!user) throw errMessage.USER_NOT_FOUND;
     return user
 }
