@@ -66,14 +66,52 @@ userRouter.post("/login", async (req, res) => {
  *      '400':
  *        description: user not authorized
  */
-userRouter.get("/", auth.validToken, async (req, res) => {
-  try {
-    const user = await userService.getUser(req.email);
-    res.status(200).send(user);
-  } catch (err) {
-    sendError(res, err);
-  }
-});
+
+userRouter.get('/',auth.validToken, async (req, res) => {
+    try {
+        const user = await userService.getUser(req.email);
+        res.status(200).send(user)
+    }
+    catch (err) {
+        sendError(res,err)
+    }
+})
+
+/**
+ * @swagger
+ * /api/user/register:
+ *  post:
+ *    description: Use to create a new user
+ *    parameters:
+ *      - name: user
+ *        in: body
+ *        description: The user object
+ *        required: true
+ *        schema:
+ *          type: object
+ *          properties:
+ *            email:
+ *              type: string
+ *              format: email
+ *            firstPassword:
+ *              type: string
+ *            secondPassword:
+ *              type: string
+ *    responses:
+ *      '200':
+ *        description: In a successful response return token
+ *        content:
+ *           application/json:
+ *             schema: 
+ *               type: string   
+ *      '400':
+ *        description: missing data
+ *        content:
+ *           application/json:
+ *             schema: 
+ *               type: string   
+ */
+
 
 userRouter.get("/forgot", async (req, res) => {
   try {

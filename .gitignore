@@ -1,9 +1,9 @@
 .env
 node_modules/
-uplouds
-uplouds/
-uploud
-uploud/
+uploads
+uploads/
+upload
+upload/
 
 # misc
 .DS_Store

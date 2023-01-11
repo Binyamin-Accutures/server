@@ -59,11 +59,10 @@ const addProject = async (user_id, project) => {
   return updateRes;
 };
 
-module.exports = {
-  createUser,
-  getUser,
-  login,
-  getUserDirectories,
-  addProject,
-  getUserAndUpdateTokenForResetPass,
-};
+const getUserAndPopulate = async (email) => {
+  const user = await userDL.findUser({email : email})
+    if (!user) throw errMessage.USER_NOT_FOUND;
+    return user
+}
+module.exports = { createUser, getUser, login, getUserDirectories, addProject, getUserAndPopulate };
+
