@@ -94,9 +94,9 @@ userRouter.get('/',auth.validToken, async (req, res) => {
  *            email:
  *              type: string
  *              format: email
- *            firstPssword:
+ *            firstPassword:
  *              type: string
- *            secondPssword:
+ *            secondPassword:
  *              type: string
  *    responses:
  *      '200':
