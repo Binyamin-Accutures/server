@@ -12,6 +12,7 @@ const projectSchema = new mongoose.Schema({
       type: Object,
       required: true,
   },
+  urlafterRunIsp:[{type:String}],
   saveSettings: { 
       type: Object,
   },

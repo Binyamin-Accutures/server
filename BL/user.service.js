@@ -64,5 +64,5 @@ const getUserAndPopulate = async (email) => {
     if (!user) throw errMessage.USER_NOT_FOUND;
     return user
 }
-module.exports = { createUser, getUser, login, getUserDirectories, addProject, getUserAndPopulate };
+module.exports = { createUser, getUser, login, getUserDirectories, addProject, getUserAndPopulate, getUserAndUpdateTokenForResetPass };
 
