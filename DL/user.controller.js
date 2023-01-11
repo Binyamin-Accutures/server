@@ -16,7 +16,8 @@ async function findUserWithPass(filter) {
 }
 
 async function findUser(filter) {
-  return await userData.findOne(filter).populate('projects');
+
+  return await userData.findOne(filter)//.populate('projects');
 }
 
 

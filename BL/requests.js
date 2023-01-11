@@ -5,7 +5,7 @@ const userService = require ("./")
 const saveIspObj = async (root,email, obj)=>{
     const user = await userService.getUser(email)
     if (user){
-const sentIspObj = await projectsCtrl.updateProject({root:root, saveSettings:{runIspSettings:obj}})
+const sentIspObj = await projectsCtrl.updateProject ({root:root, saveSettings:{runIspSettings:obj}})
 
     }
     (user._id,{ root:`./${baseDir}`,runIspSettings: {undefined },createDate: date})

@@ -32,8 +32,13 @@ files.forEach((v,i)=>{
  const src = fs.readdirSync(`./${baseDir}/original`).map((v)=>{
     return `/api/files/${baseDir}/original/${v}`
 })
-
-const createProj = await createProject(user._id,{ root:`./${baseDir}`,runIspSettings: {undefined },createDate: date})
+const projProps= {
+   root:`./${baseDir}`,
+   runIspSettings: {undefined },
+   createDate: date,
+   user:req.email
+  }
+const createProj = await createProject(user._id, projProps)
 if (!createProj) return ////error
 return src
 }

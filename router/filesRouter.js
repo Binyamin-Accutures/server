@@ -58,9 +58,7 @@ filesRouter.post('/', upload.any("files"), async (req,res)=>{
 
     try{
        const src= await uploadRewFiles (req)
-     
-        res.send({src})  
-
+       res.send({src})  
     }
     catch(err){
         sendError(res,err)

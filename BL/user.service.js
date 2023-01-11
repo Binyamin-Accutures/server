@@ -17,6 +17,7 @@ const login = async (data) => {
 
 const createUser = async (data) => {
   checkData(data,['email', 'firstPassword', 'secondPassword']);
+
   if(data.firstPassword!==data.secondPassword) throw errMessage.PASSWORDS_ARE_NOT_EQUAL
     let user = await userDL.findUser( {email:data.email})
     if(user) throw errMessage.USER_ALREADY_REGISTERED

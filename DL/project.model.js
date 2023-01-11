@@ -1,6 +1,10 @@
 const mongoose = require("mongoose");
 const projectSchema = new mongoose.Schema({
- root:{ 
+ user:{
+  type:String,
+  required:true
+ },
+  root:{ 
   type:String,
   required:true
 },
@@ -13,7 +17,7 @@ const projectSchema = new mongoose.Schema({
   },
   createDate: {
     type: Date,
-    default: Date.now,
+    required:true
   },
   isActive: {
     type: Boolean,

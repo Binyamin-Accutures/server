@@ -114,7 +114,7 @@ userRouter.get('/',auth.validToken, async (req, res) => {
  */
 
 userRouter.post('/register',async (req, res) => {
-    try {
+  try {
         const user = await userService.createUser(req.body);
         res.status(200).send(user)
     }
