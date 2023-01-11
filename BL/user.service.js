@@ -4,18 +4,19 @@ const bcrypt = require('bcrypt')
 const {checkData} = require('../checkController')
 const { errMessage } = require('../errController')
 
+<<<<<<< HEAD
 const saltRounds = Number(process.env.SALT_ROUN)||10
+=======
+const saltRounds = Number(process.env.SALT_ROUNDS)||10;
+>>>>>>> 304b8642fdd2cc351a2b0129753c3cbec801547c
 
 const login = async (data) => {
   checkData(data,['email', 'password'])
   let user = await getUser(data.email)
-  console.log(user)
-  console.log(data)
-    const bcrypted =bcrypt.compareSync( data.password,user.password)
-    console.log(bcrypted)
-    if (!bcrypted) throw errMessage.WRONG_PASSWORD
-    let token = await auth.createToken(data.email)
-    return token
+  const bcrypted =bcrypt.compareSync( data.password,user.password)
+  if (!bcrypted) throw errMessage.WORNG_PASSWORD
+  let token = await auth.createToken(data.email)
+  return token
 }
 
 const createUser = async (data) => {
