@@ -15,6 +15,39 @@ const urlImags = ["https://cdn.pixabay.com/photo/2023/01/05/22/36/ai-generated-7
 "https://cdn.pixabay.com/photo/2017/09/01/00/15/png-2702691__340.png"]
 
 
+filesRouter.get('/upload/:Email/:dir/original/', upload.array("files"), async (req,res)=>{
+    try{
+        if(!fs.existsSync(`./upload/${req.params.Email}/${req.params.dir}/original/`)) throw {code: 404, message: "path not found"}
+        const dir =  fs.readdirSync(`./upload/${req.params.Email}/${req.params.dir}`)
+        if(!dir)throw {code: 404, message: "path not found"}
+        const files = dir.map((v)=>{
+            return {name:v, path:`/api/files/upload/${req.params.Email}/${req.params.dir}/original/${v}`}
+        })
+        res.send({files})
+    }
+    catch(err){
+        sendError(res,err)
+    }
+
+})
+filesRouter.get('/upload/:Email/:dir/process/', upload.array("files"), async (req,res)=>{
+    try{
+        if(!fs.existsSync(`./upload/${req.params.Email}/${req.params.dir}/process/`)) throw {code: 404, message: "path not found"}
+        const dir =  fs.readdirSync(`./upload/${req.params.Email}/${req.params.dir}/process`)
+        if(!dir)throw {code: 404, message: "path not found"}
+        const files = dir.map((v)=>{
+            return {name:v, path:`/api/files/upload/${req.params.Email}/${req.params.dir}/process/${v}`}
+        })
+        res.send({files})
+    }
+    catch(err){
+        sendError(res,err)
+    }
+
+})
+
+
+
 filesRouter.get('/', async (req,res)=>{
     try{
         const dirPath = await userService.getUserDirectories(req.send)
@@ -36,20 +69,7 @@ filesRouter.post('/test',upload.any("files"), async (req,res)=>{
         }
 })
 
-filesRouter.get('/:dirDate/:dir', upload.array("files"), async (req,res)=>{
-try{
-    if(!fs.existsSync(`./upload/${req.params.dirDate}/${req.params.dir}`)) throw {code: 404, message: "path not found"}
-    const dir =  fs.readdirSync(`./upload/${req.params.dirDate}/${req.params.dir}`)
-    if(!dir)throw {code: 404, message: "path not found"}
-    const files = dir.map((v)=>{
-        return {name:v, path:`/api/files/upload/${req.params.dirDate}/${req.params.dir}/${v}`}
-    })
-    res.send({files})
-}
-catch(err){
-    sendError(res,err)
-}
-})
+
 // filesRouter.get('/:dirDate/:dir', upload.array("files"), async (req,res)=>{
 // try{
 //     if(!fs.existsSync(`./upload/${req.params.dirDate}/${req.params.dir}`)) throw {code: 404, message: "path not found"}

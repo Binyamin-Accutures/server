@@ -6,6 +6,7 @@ const auth = require('../auth')
 
 mainRouter.use("/user",userRouter)
 mainRouter.use("/files",auth.validToken,filesRouter)
+mainRouter.use("/barkuni",filesRouter)
 
 
 module.exports = mainRouter

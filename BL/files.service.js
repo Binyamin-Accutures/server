@@ -6,7 +6,10 @@ const fs = require('fs');
 const userService = require('../BL/user.service');
 const { sendError } = require('../errController');
 const {createProject} = require("./project.service")
-const projectsCtrl = require ("../DL/project.controller") 
+const projectsCtrl = require ("../DL/project.controller"); 
+const { default: axios } = require('axios');
+// import {FormData, File} from "formdata-node" 
+// import fetch from "node-fetch"
 
 const uploadRewFiles = async (req,res)=>{
 
@@ -49,13 +52,22 @@ const saveIspObj = async (props)=>{
   const sentIspObj = await projectsCtrl.updateAndReturn (exict[0]._id,{ runIspSettings :props.runIspSettings})
 return sentIspObj.runIspSettings
 }
-const sendToRemoteServer = async ()=>{
-const props ={root: "./upload/davidhakak19@gmail.com/1673442381937"}
+const sendToRemoteServer = async (props)=>{
+// const props ={root: "./upload/davidhakak19@gmail.com/1673442381937"}
   const {runIspSettings} =  await projectsCtrl.readOne({root:props.root});   
-  console.log("selectedProj************", runIspSettings)
+
+
+const formdata = new FormData()
+const file = new File() (["My hovercraft is full of eels"], "file.txt")
+
+formdata.append("file", file)
+
+await fetch("https://httpbin.org/post", {method: "post", body: form})
+  
+  const res = await axios.post(serverUrl,projFiles)
 }
 
-sendToRemoteServer()
+// sendToRemoteServer()
 module.exports ={uploadRewFiles, saveIspObj, sendToRemoteServer}
 
 
