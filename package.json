@@ -1,10 +1,13 @@
 {
   "dependencies": {
     "aws-sdk": "^2.1292.0",
+    "axios": "^1.2.2",
     "bcrypt": "^5.1.0",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
+    "FormData": "^0.10.1",
+    "formdata-node": "^5.0.0",
     "jsonwebtoken": "^9.0.0",
     "mongoose": "^6.8.3",
     "multer": "^1.4.5-lts.1",
@@ -18,7 +21,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
-    "runDev": "nodemon index.js"
+    "dev": "nodemon index.js"
   },
   "author": "",
   "license": "ISC",

@@ -10,8 +10,8 @@ const { getFilesPathes, openProject } = require('../BL/calibration.service');
 const util = require('util')
 const unlinkFile = util.promisify(fs.unlink)
 const { uploadFiles, getFileStream } = require('../s3')
-const {uploadRewFiles} = require("../BL/files.service");
 const { log } = require('console');
+const {uploadRewFiles, saveIspObj ,getAllFilesInFolder} = require("../BL/files.service")
 
 const urlImags = ["https://cdn.pixabay.com/photo/2023/01/05/22/36/ai-generated-7700016__340.png",
     "https://cdn.pixabay.com/photo/2015/10/01/17/17/car-967387__340.png",
@@ -99,9 +99,10 @@ filesRouter.post('/images', upload.any('image'), async (req, res) => {
     res.send(`/images/${result.Key}`)
 })
 
+
 /**
  * @swagger
- * /api/files/:
+ * /api/files/projects:
  *  get:
  *    description: Use to login need to send email and password
  *    parameters:
@@ -126,9 +127,9 @@ filesRouter.post('/images', upload.any('image'), async (req, res) => {
  *               type: array
  */
 
-filesRouter.get('/', async (req, res) => {
+filesRouter.get('/projects', async (req, res) => {
     try {
-        const dirPath = await userService.getUserDirectories(req.send)
+        const dirPath = await userService.getUserDirectories(req.email)
         res.send(dirPath)
     }
     catch (err) {
@@ -138,7 +139,7 @@ filesRouter.get('/', async (req, res) => {
 
 /**
  * @swagger
- * /api//:dirDate/:dir:
+ * /api//{projectName}/{folder}:
  *  get:
  *    description: Use to login need to send email and password
  *    parameters:
@@ -148,11 +149,11 @@ filesRouter.get('/', async (req, res) => {
  *        required: true
  *        schema:
  *          type: string
- *      - name: dirDate
- *        in: params
+ *      - name: projectName
+ *        in: path
  *        required: true
- *      - name: dir
- *        in: params
+ *      - name: folder
+ *        in: path
  *        required: true
  *    responses:
  *      '200':
@@ -161,36 +162,70 @@ filesRouter.get('/', async (req, res) => {
  *           application/json:
  *             schema:
  *               type: string
- *      '400':
- *        description: In a successful response return token
+ *      '404':
+ *        description: not found
  *        content:
  *           application/json:
  *             schema:
  *               type: object
  */
 
-filesRouter.get('/:dirDate/:dir', upload.array("files"), async (req, res) => {
-    try {
-        if (!fs.existsSync(`./upload/${req.params.dirDate}/${req.params.dir}`)) throw { code: 404, message: "path not found" }
-        const dir = fs.readdirSync(`./upload/${req.params.dirDate}/${req.params.dir}`)
-        if (!dir) throw { code: 404, message: "path not found" }
-        const files = dir.map((v) => {
-            return { name: v, path: `/api/files/upload/${req.params.dirDate}/${req.params.dir}/${v}` }
-        })
-        res.send({ files })
+filesRouter.get('/upload/email/:projectName/:folder', async (req,res)=>{
+
+    const requestedFolder = `upload/${req.email}/${req.params.projectName}/${req.params.folder}`
+    
+    try{
+        getAllFilesInFolder(requestedFolder)
+        res.send({files})
     }
-    catch (err) {
-        sendError(res, err)
+    catch(err){
+        sendError(res,err)
+    }
+
+})
+
+/**
+ * @swagger
+ * /api/files/runisp:
+ *  post:
+ *    description: upload run isp settings
+ *    parameters:
+ *      - in: body
+ *        name: runispSettings
+ *        type: json
+ *      - in: body
+ *        name: projectName
+ *        type: string
+ *      - name: Authorization
+ *        in: header
+ *        description: JWT token for authentication
+ *        required: true
+ *        schema:
+ *          type: string
+ *    responses:
+ *      '200':
+ *        description: In a successful response return success message
+ *        content:
+ *           application/json:
+ *             schema: 
+ *               type: string 
+ */
+filesRouter.post('/runisp', async (req,res)=>{
+
+    try{
+       const src= await saveRunIspObj (req.body)
+       //requset from accutur
+       res.send({src:urlImags})  
+    }
+    catch(err){
+        sendError(res,err)
     }
 })
 
 filesRouter.post('/', upload.any("files"), async (req,res)=>{
-
     try{
-       const src= await uploadRewFiles (req)
-     
-        res.send({src})
-
+       const project= await uploadRewFiles({email:req.email,files:req.files})
+       res.send(project)  
     }
     catch (err) {
         sendError(res, err)
@@ -199,8 +234,7 @@ filesRouter.post('/', upload.any("files"), async (req,res)=>{
 
 filesRouter.put('/', async (req, res) => {
     try {
-        const isUpdate = await projectService.updateProject(`./upload/${req.body.path}`, req.body.saveSettings)
-        if (!isUpdate) throw { code: 500, message: `can't update project` }
+        projectService.updateProject(`./upload/${req.body.path}`, req.body.saveSettings)
         res.send({ success: true })
     }
     catch (err) {

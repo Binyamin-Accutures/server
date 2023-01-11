@@ -5,7 +5,6 @@ const projectSchema = new mongoose.Schema({
 },
   runIspSettings: {
       type: Object,
-      required: true,
   },
   urlAfterRunIsp:[{type:String}],
   saveSettings: { 
@@ -13,7 +12,6 @@ const projectSchema = new mongoose.Schema({
   },
   createDate: {
     type: Date,
-    default: Date.now,
   },
   isActive: {
     type: Boolean,

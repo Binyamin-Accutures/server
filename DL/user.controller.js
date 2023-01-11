@@ -1,4 +1,3 @@
-const { error } = require("console");
 const { errMessage } = require("../errController");
 const userData = require("./user.model");
 
@@ -20,7 +19,7 @@ async function findUser(filter) {
 }
 
 async function update(id, newData) {
-  return await userData.updateOne({ _id: id}, newData).populate("projects")
+  return await userData.updateOne({ _id: id}, newData)
 }
 
 async function updateAndReturn(id, newData){
@@ -33,4 +32,4 @@ async function del(id) {
   return await update(id, { isActive: false });
 }
 
-module.exports = { create, read, update, del, findUser, updateAndReturn, findUserWithPass};
+module.exports = { create, read, update, del, findUser, updateAndReturn, findUserWithPass, };
