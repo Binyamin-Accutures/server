@@ -16,6 +16,7 @@ async function findUserWithPass(filter) {
 }
 
 async function findUser(filter) {
+
   return await userData.findOne(filter).populate('projects');
 }
 
@@ -33,4 +34,4 @@ async function del(id) {
   return await update(id, { isActive: false });
 }
 
-module.exports = { create, read, update, del, findUser, updateAndReturn, findUserWithPass};
+module.exports = { create, read, update, del, findUser, updateAndReturn, findUserWithPass, };

@@ -107,7 +107,7 @@ userRouter.get("/", auth.validToken, async (req, res) => {
  *        description: missing data
  *        content:
  *           application/json:
- *             schema:
+ *             schema: 
  *               type: string
  */
 

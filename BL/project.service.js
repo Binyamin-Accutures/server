@@ -14,7 +14,7 @@ const createProject = async (user_id, data) =>{
 
     const newProject = await projDL.create(data)
     const res = await userService.addProject(user_id, newProject)
-    return errMessage.SUCCESS
+    return res
 }
 
 const updateProject = async (root,saveSettings) =>{

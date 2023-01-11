@@ -1,4 +1,3 @@
-require('dotenv').config()
 const fs = require('fs')
 const S3 = require('aws-sdk/clients/s3')
 
@@ -13,27 +12,31 @@ const s3 = new S3({
   secretAccessKey
 })
 
-// uploads a file to s3
-function uploadFile(file) {
-  const fileStream = fs.createReadStream(file.path)
-
-  const uploadParams = {
-    Bucket: bucketName,
-    Body: fileStream,
-    Key: file.filename
-  }
-
-  return s3.upload(uploadParams).promise()
+// uploads a files to s3
+async function uploadFiles(files, path) { // array of files to upload and path to location of the files in S3
+  
+    const params = files.map(file => {
+        return {
+            Bucket: bucketName,
+            Key: path,
+            Body: fs.createReadStream(file.path) // ?????
+        }
+    })
+    return await Promise.all(params.map(param => s3.upload(param).promise()))
 }
-exports.uploadFile = uploadFile
+exports.uploadFile = uploadFiles
+// #################################################################
+
+
 
 
 // downloads a file from s3
-function getFileStream(fileKey) {
-  const downloadParams = {
-    Key: fileKey,
-    Bucket: bucketName
-  }
+function getFileStream(path) {
+    
+    const downloadParams = {
+        Bucket: bucketName,
+        Key: somePath
+    }
 
   return s3.getObject(downloadParams).createReadStream()
 }
