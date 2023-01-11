@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
-require("./project.model")
-
+require("./project.model");
 
 const userSchema = new mongoose.Schema({
   email: {
@@ -11,16 +10,21 @@ const userSchema = new mongoose.Schema({
   password: {
     type: String,
     required: true,
-    select: true,
+    select: false,
   },
-    createDate: {
+  createDate: {
     type: Date,
     default: Date.now,
   },
-    projects:[{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "project",
-    }],
+  projects: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "project",
+    },
+  ],
+  resetPass: {
+    type: String,
+  },
   isActive: {
     type: Boolean,
     default: true,
