@@ -125,17 +125,6 @@ filesRouter.get('/:Email', async (req,res)=>{
         }
 })
 
-filesRouter.post('/test',upload.any("files"), async (req,res)=>{
-
-    try{
-        const dirPath = req.files.map(v=>v.path)
-            res.send(dirPath)
-        }
-        catch(err){
-            sendError(res,err)
-        }
-})
-
 
 //example: insid the body:
 // jsonFile ={

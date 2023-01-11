@@ -50,8 +50,8 @@ return [{src},{projProps}]
 
 const saveIspObj = async (props)=>{
   const exict = await  projectsCtrl.readOne({root:props.root}) 
-  const sentIspObj = await projectsCtrl.updateAndReturn (exict[0]._id,{ runIspSettings :props.runIspSettings})
-return sentIspObj.runIspSettings
+  const sentIspObj = await projectsCtrl.updateAndReturn (exict._id,{ runIspSettings :props.runIspSettings})
+  if(sentIspObj) return sentIspObj.runIspSettings
 }
 
 const sendToRemoteServer = async (root)=>{
@@ -76,7 +76,7 @@ const sendToRemoteServer = async (root)=>{
 return processedFiles 
 }
 
-// sendToRemoteServer()
+
 
 
 const getAllFilesInFolder = async(requestedFolder)=>{
