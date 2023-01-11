@@ -41,3 +41,4 @@ function getFileStream(path) {
   return s3.getObject(downloadParams).createReadStream()
 }
 exports.getFileStream = getFileStream
+
