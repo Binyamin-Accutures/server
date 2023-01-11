@@ -19,8 +19,8 @@ async function update(id, newData) {
   return await projectData.updateOne({ _id: id}, newData);
 }
 
-async function updateAndReturn(id, newData){
-  let data = await projectData.findOneAndUpdate({ _id: id}, newData,{new:true})
+async function updateAndReturn(_id, newData){
+  let data = await projectData.findOneAndUpdate({ _id:_id}, newData,{new:true})
   if(!data) throw errMessage.PROJECT_NOT_FOUND
   return data
 }

@@ -1,14 +1,13 @@
 const mongoose = require("mongoose");
 const projectSchema = new mongoose.Schema({
  root:{ 
-  type:String,
-  required:true
+  type:String
 },
   runIspSettings: {
       type: Object,
       required: true,
   },
-  urlafterRunIsp:[{type:String}],
+  urlAfterRunIsp:[{type:String}],
   saveSettings: { 
       type: Object,
   },

@@ -8,11 +8,16 @@ const getFile = async (root) => {
     return project
 } 
 
+const getProject = async (root) => {
+    const project = await projDL.readOne({root})
+    return project
+} 
+
 const createProject = async (user_id, data) =>{
-    checkData({user_id,...data},["root", "runIspSettings"])
+    checkData({user_id,...data},["user_id", "runIspSettings","urlAfterRunIsp"])
     const newProject = await projDL.create(data)
-    const res = await userService.addProject(user_id, newProject)
-    return errMessage.SUCCESS
+    await userService.addProject(user_id, newProject)
+    return newProject._id
 }
 
 const updateProject = async (root,saveSettings) =>{
@@ -22,8 +27,15 @@ const updateProject = async (root,saveSettings) =>{
     return res
 }
 
+
+const updateProjectById = async (_id,newData) =>{
+    checkData({_id,saveSettings},["_id","newData"])
+    const res = await projDL.updateAndReturn(_id, newData)
+    return res
+}
+
 const getDirName = (path)=>{
     return path.replace("./upload/","")
 }
 
-module.exports = { getFile, createProject, updateProject,getDirName}
+module.exports = { getFile, createProject, updateProject,getDirName,getProject,updateProjectById }

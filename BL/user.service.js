@@ -50,4 +50,8 @@ const addProject = async (user_id, project) => {
   return updateRes;
 };
 
-module.exports = { createUser, getUser, login, getUserDirectories, addProject };
+const updateUser = async (user_id,newData) => {
+  const updateRes = await userDL.updateAndReturn(user_id,newData);
+  return updateRes;
+}
+module.exports = { createUser, getUser, login, getUserDirectories, addProject,updateUser };
