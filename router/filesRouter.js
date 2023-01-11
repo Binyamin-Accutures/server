@@ -9,7 +9,7 @@ const userService = require('../BL/user.service');
 const projectService = require('../BL/project.service');
 const { sendError } = require('../errController');
 
-const {uploadRewFiles, saveIspObj,uploadFiles} = require("../BL/files.service")
+const {uploadRewFiles, saveIspObj,uploadFiles ,getAllFilesInFolder} = require("../BL/files.service")
 const { uploadFile, getFileStream } = require('../s3')
 
 const urlImags = ["https://cdn.pixabay.com/photo/2023/01/05/22/36/ai-generated-7700016__340.png",
@@ -95,30 +95,15 @@ filesRouter.post('/images', upload.single('image'), async (req, res) => {
   
   
 
+//get original or processed files Examples:
+//http://localhost:5000/api/files/upload/davidhakak19@gmail.com/1673450213572/original
+//http://localhost:5000/api/files/upload/davidhakak19@gmail.com/1673450213572/processed
+filesRouter.get('/upload/:Email/:dir/:ProjState/', upload.array("files"), async (req,res)=>{
 
-filesRouter.get('/upload/:Email/:dir/original/', upload.array("files"), async (req,res)=>{
+    const requestedFolder = `upload/${req.params.Email}/${req.params.dir}/${req.params.ProjState}`
+    
     try{
-        if(!fs.existsSync(`./upload/${req.params.Email}/${req.params.dir}/original/`)) throw {code: 404, message: "path not found"}
-        const dir =  fs.readdirSync(`./upload/${req.params.Email}/${req.params.dir}`)
-        if(!dir)throw {code: 404, message: "path not found"}
-        const files = dir.map((v)=>{
-            return {name:v, path:`/api/files/upload/${req.params.Email}/${req.params.dir}/original/${v}`}
-        })
-        res.send({files})
-    }
-    catch(err){
-        sendError(res,err)
-    }
-
-})
-filesRouter.get('/upload/:Email/:dir/process/', upload.array("files"), async (req,res)=>{
-    try{
-        if(!fs.existsSync(`./upload/${req.params.Email}/${req.params.dir}/process/`)) throw {code: 404, message: "path not found"}
-        const dir =  fs.readdirSync(`./upload/${req.params.Email}/${req.params.dir}/process`)
-        if(!dir)throw {code: 404, message: "path not found"}
-        const files = dir.map((v)=>{
-            return {name:v, path:`/api/files/upload/${req.params.Email}/${req.params.dir}/process/${v}`}
-        })
+        getAllFilesInFolder(requestedFolder)
         res.send({files})
     }
     catch(err){
@@ -128,10 +113,10 @@ filesRouter.get('/upload/:Email/:dir/process/', upload.array("files"), async (re
 })
 
 
-
-filesRouter.get('/', async (req,res)=>{
+// get all users project dir: example ---{ "name": "davidhakak19@gmail.com/1673441480619"}
+filesRouter.get('/:Email', async (req,res)=>{
     try{
-        const dirPath = await userService.getUserDirectories(req.send)
+        const dirPath = await userService.getUserDirectories(req.params.Email)
             res.send(dirPath)
         }
         catch(err){
@@ -150,21 +135,6 @@ filesRouter.post('/test',upload.any("files"), async (req,res)=>{
         }
 })
 
-
-// filesRouter.get('/:dirDate/:dir', upload.array("files"), async (req,res)=>{
-// try{
-//     if(!fs.existsSync(`./upload/${req.params.dirDate}/${req.params.dir}`)) throw {code: 404, message: "path not found"}
-//     const dir =  fs.readdirSync(`./upload/${req.params.dirDate}/${req.params.dir}`)
-//     if(!dir)throw {code: 404, message: "path not found"}
-//     const files = dir.map((v)=>{
-//         return {name:v, path:`/api/files/upload/${req.params.dirDate}/${req.params.dir}/${v}`}
-//     })
-//     res.send({files})
-// }
-// catch(err){
-//     sendError(res,err)
-// }
-// })
 
 
 filesRouter.post('/runisp', async (req,res)=>{

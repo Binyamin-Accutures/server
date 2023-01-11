@@ -68,7 +68,19 @@ await fetch("https://httpbin.org/post", {method: "post", body: form})
 }
 
 // sendToRemoteServer()
-module.exports ={uploadRewFiles, saveIspObj, sendToRemoteServer}
+
+
+const getAllFilesInFolder = async(requestedFolder)=>{
+
+  if(!fs.existsSync(`./${requestedFolder}`)) throw {code: 404, message: "path not found"}
+  const dir =  fs.readdirSync(`./${requestedFolder}`)
+  if(!dir)throw {code: 404, message: "path not found"}
+  const files = dir.map((v)=>{
+    return {name:v, path:`/api/files/${requestedFolder}/${v}`}
+  })
+return files
+}
+module.exports ={uploadRewFiles, saveIspObj, sendToRemoteServer, getAllFilesInFolder}
 
 
 
