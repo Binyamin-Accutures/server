@@ -25,6 +25,17 @@ filesRouter.get('/', async (req,res)=>{
         }
 })
 
+filesRouter.post('/test',upload.any("files"), async (req,res)=>{
+
+    try{
+        const dirPath = req.files.map(v=>v.path)
+            res.send(dirPath)
+        }
+        catch(err){
+            sendError(res,err)
+        }
+})
+
 filesRouter.get('/:dirDate/:dir', upload.array("files"), async (req,res)=>{
 try{
     if(!fs.existsSync(`./upload/${req.params.dirDate}/${req.params.dir}`)) throw {code: 404, message: "path not found"}

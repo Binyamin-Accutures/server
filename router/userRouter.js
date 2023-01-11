@@ -109,7 +109,7 @@ userRouter.get('/',auth.validToken, async (req, res) => {
  *        content:
  *           application/json:
  *             schema: 
- *               type: string   
+ *               type: string
  */
 
 
