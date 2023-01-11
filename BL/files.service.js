@@ -39,7 +39,8 @@ const projProps= {
    root:`./${baseDir}`,
    runIspSettings: { },
    createDate: date,
-   user:req.email
+   user:req.email,
+   projName:date
   }
 const createProj = await createProject(user._id, projProps)
 if (!createProj) return ////error
@@ -52,22 +53,20 @@ const saveIspObj = async (props)=>{
   const sentIspObj = await projectsCtrl.updateAndReturn (exict[0]._id,{ runIspSettings :props.runIspSettings})
 return sentIspObj.runIspSettings
 }
+
 const sendToRemoteServer = async (props)=>{
 // const props ={root: "./upload/davidhakak19@gmail.com/1673442381937"}
-  const {runIspSettings} =  await projectsCtrl.readOne({root:props.root});   
+  const project  =  await projectsCtrl.readOne({root:"./upload/davidhakak19@gmail.com/1673442381937"}); 
+  console.log("************",project)  
+  const runIsp= project.runIspSettings
+const originalFiles =  await getAllFilesInFolder (`${project.root.slice(0,2)}`)
+console.log("************",originalFiles)  
 
-
-const formdata = new FormData()
-const file = new File() (["My hovercraft is full of eels"], "file.txt")
-
-formdata.append("file", file)
-
-await fetch("https://httpbin.org/post", {method: "post", body: form})
   
-  const res = await axios.post(serverUrl,projFiles)
+  // const res = await axios.post(serverUrl,originalFiles)
 }
 
-// sendToRemoteServer()
+sendToRemoteServer()
 
 
 const getAllFilesInFolder = async(requestedFolder)=>{
