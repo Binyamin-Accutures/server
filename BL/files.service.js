@@ -6,11 +6,11 @@ const fs = require('fs');
 const userService = require('../BL/user.service');
 const { sendError } = require('../errController');
 const {createProject} = require("./project.service")
+const projectsCtrl = require ("../DL/project.controller") 
 
+const uploadRewFiles = async (req,res)=>{
 
-const uploadRewFiles = async (req)=>{
   const user = await userService.getUser(req.email)
-  console.log(user)
   const date = new Date()
   const files = req.files
 if (!files) sendError(res, {code: 401})
@@ -34,16 +34,29 @@ files.forEach((v,i)=>{
 })
 const projProps= {
    root:`./${baseDir}`,
-   runIspSettings: {undefined },
+   runIspSettings: { },
    createDate: date,
    user:req.email
   }
 const createProj = await createProject(user._id, projProps)
 if (!createProj) return ////error
-return src
+
+return [{src},{projProps}]
 }
 
-module.exports ={uploadRewFiles}
+const saveIspObj = async (props)=>{
+  const exict = await  projectsCtrl.read({props:root.root,email:props.email}) 
+  const sentIspObj = await projectsCtrl.updateAndReturn (exict[0]._id,{ runIspSettings :props.runIspSettings})
+return sentIspObj.runIspSettings
+}
+const sendToRemoteServer = async ()=>{
+const props ={root: "./upload/davidhakak19@gmail.com/1673442381937"}
+  const {runIspSettings} =  await projectsCtrl.readOne({root:props.root});   
+  console.log("selectedProj************", runIspSettings)
+}
+
+sendToRemoteServer()
+module.exports ={uploadRewFiles, saveIspObj, sendToRemoteServer}
 
 
 

@@ -8,7 +8,7 @@ const saltRounds = Number(process.env.SALT_ROUNDS) || 10;
 
 const login = async (data) => {
   checkData(data, ["email", "password"]);
-  let user = await userDL.findUserWithPass(data.email);
+  let user = await userDL.findUserWithPass({email:data.email});
   const bcrypted = bcrypt.compareSync(data.password, user.password);
   if (!bcrypted) throw errMessage.WORNG_PASSWORD;
   let token = await auth.createToken(data.email);
