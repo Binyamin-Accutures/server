@@ -1,36 +1,45 @@
-const userDL =require( '../DL/user.controller')
-const auth =  require('../auth')
-const bcrypt = require('bcrypt')
-const {checkData} = require('../checkController')
-const { errMessage } = require('../errController')
+const userDL = require("../DL/user.controller");
+const auth = require("../auth");
+const bcrypt = require("bcrypt");
+const { checkData } = require("../checkController");
+const { errMessage } = require("../errController");
 
-const saltRounds = Number(process.env.SALT_ROUNDS)||10;
+const saltRounds = Number(process.env.SALT_ROUNDS) || 10;
 
 const login = async (data) => {
-  checkData(data,['email', 'password'])
-  let user = await getUser(data.email)
-  const bcrypted =bcrypt.compareSync( data.password,user.password)
-  if (!bcrypted) throw errMessage.WORNG_PASSWORD
-  let token = await auth.createToken(data.email)
-  return token
-}
+  checkData(data, ["email", "password"]);
+  let user = await userDL.findUserWithPass(data.email);
+  const bcrypted = bcrypt.compareSync(data.password, user.password);
+  if (!bcrypted) throw errMessage.WORNG_PASSWORD;
+  let token = await auth.createToken(data.email);
+  return token;
+};
 
 const createUser = async (data) => {
-  checkData(data,['email', 'firstPassword', 'secondPassword']);
-  if(data.firstPassword!==data.secondPassword) throw errMessage.PASSWORDS_ARE_NOT_EQUAL
-    let user = await userDL.findUser( {email:data.email})
-    if(user) throw errMessage.USER_ALREADY_REGISTERED
-    data.firstPassword = bcrypt.hashSync(data.firstPassword, saltRounds);
-    user = await userDL.create(data)
-    let token = await auth.createToken(data.email)
-    return token
-}
+  checkData(data, ["email", "firstPassword", "secondPassword"]);
+  if (data.firstPassword !== data.secondPassword)
+    throw errMessage.PASSWORDS_ARE_NOT_EQUAL;
+  let user = await userDL.findUser({ email: data.email });
+  if (user) throw errMessage.USER_ALREADY_REGISTERED;
+  data.firstPassword = bcrypt.hashSync(data.firstPassword, saltRounds);
+  user = await userDL.create(data);
+  let token = await auth.createToken(data.email);
+  return token;
+};
 
 const getUser = async (email) => {
-  const user = await userDL.findUserWithPass({email : email})
-    if (!user) throw errMessage.USER_NOT_FOUND;
-    return user
-}
+  const user = await userDL.findUser({ email: email });
+  if (!user) throw errMessage.USER_NOT_FOUND;
+  return user;
+};
+
+const getUserAndUpdateTokenForResetPass = async (email) => {
+ const user =  await getUser(email);
+  const token = bcrypt.hashSync(Date.now.toString(), saltRounds);
+  await userDL.updateProj(user._id, {
+    resetPass: token,
+  });
+};
 
 const getUserDirectories = async (email) => {
   let user = await getUser(email);
@@ -50,4 +59,11 @@ const addProject = async (user_id, project) => {
   return updateRes;
 };
 
-module.exports = { createUser, getUser, login, getUserDirectories, addProject };
+module.exports = {
+  createUser,
+  getUser,
+  login,
+  getUserDirectories,
+  addProject,
+  getUserAndUpdateTokenForResetPass,
+};
