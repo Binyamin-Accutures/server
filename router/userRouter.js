@@ -110,7 +110,7 @@ userRouter.get('/',auth.validToken, async (req, res) => {
  *        content:
  *           application/json:
  *             schema: 
- *               type: string   
+ *               type: string
  */
 
 userRouter.post('/register',async (req, res) => {
