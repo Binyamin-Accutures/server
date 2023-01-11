@@ -5,13 +5,12 @@ const upload = multer({dest:"./upload"})
 const fs = require('fs');
 const userService = require('../BL/user.service');
 const projectService = require('../BL/project.service');
+const { sendError } = require('../errController');
 const urlImags = ["https://cdn.pixabay.com/photo/2023/01/05/22/36/ai-generated-7700016__340.png",
 "https://cdn.pixabay.com/photo/2015/10/01/17/17/car-967387__340.png",
 "https://cdn.pixabay.com/photo/2017/02/04/22/37/panther-2038656__340.png",
 "https://cdn.pixabay.com/photo/2015/10/01/19/05/car-967470__340.png",
 "https://cdn.pixabay.com/photo/2017/09/01/00/15/png-2702691__340.png"]
-
-filesRouter.use('/',express.static('upload'))
 
 
 filesRouter.get('/', async (req,res)=>{
@@ -20,11 +19,11 @@ filesRouter.get('/', async (req,res)=>{
             res.send(dirPath)
         }
         catch(err){
-            res.send(err)
+            sendError(res,err)
         }
 })
 
-filesRouter.get('/:dirDate/:dir', upload.array("files"), async (req,res, next)=>{
+filesRouter.get('/:dirDate/:dir', upload.array("files"), async (req,res)=>{
 try{
     if(!fs.existsSync(`./upload/${req.params.dirDate}/${req.params.dir}`)) throw {code: 404, message: "path not found"}
     const dir =  fs.readdirSync(`./upload/${req.params.dirDate}/${req.params.dir}`)
@@ -35,12 +34,11 @@ try{
     res.send({files})
 }
 catch(err){
-    req.errCode = err
-    next()
+    sendError(res,err)
 }
-},errController)
+})
 
-filesRouter.post('/', upload.any("files"), async (req,res, next)=>{
+filesRouter.post('/', upload.any("files"), async (req,res)=>{
     try{
         const user = await userService.getUser(req.body.email)
         const date = new Date()
@@ -73,22 +71,20 @@ filesRouter.post('/', upload.any("files"), async (req,res, next)=>{
 
     }
     catch(err){
-        req.errCode = err
-        next()
+        sendError(res,err)
     }
-},errController)
+})
 
-filesRouter.put('/',async (req, res, next)=>{
+filesRouter.put('/',async (req, res)=>{
     try{
         const isUpdate = await projectService.updateProject(`./upload/${req.body.path}`,req.body.saveSettings)
         if(!isUpdate)throw {code:500,message:`can't update project`}
         res.send({success:true})
     }
     catch(err){
-        req.errCode = err
-        next()
+        sendError(res,err)
     }
-    },errController)
+    })
 
 module.exports = filesRouter
 
