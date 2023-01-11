@@ -7,12 +7,124 @@ const userService = require('../BL/user.service');
 const projectService = require('../BL/project.service');
 const { sendError } = require('../errController');
 const { getFilesPathes, openProject } = require('../BL/calibration.service');
+const util = require('util')
+const unlinkFile = util.promisify(fs.unlink)
+const { uploadFiles, getFileStream } = require('../s3')
+const {uploadRewFiles} = require("../BL/files.service");
+const { log } = require('console');
+
 const urlImags = ["https://cdn.pixabay.com/photo/2023/01/05/22/36/ai-generated-7700016__340.png",
     "https://cdn.pixabay.com/photo/2015/10/01/17/17/car-967387__340.png",
     "https://cdn.pixabay.com/photo/2017/02/04/22/37/panther-2038656__340.png",
     "https://cdn.pixabay.com/photo/2015/10/01/19/05/car-967470__340.png",
     "https://cdn.pixabay.com/photo/2017/09/01/00/15/png-2702691__340.png"]
 
+/**
+ * @swagger
+ * /api/files/images/{key}:
+ *  get:
+ *    description: get image from bucket
+ *    parameters:
+ *      - name: key
+ *        in: path
+ *        description: key of img
+ *        required: true
+ *        schema:
+ *          type: string 
+ *      - name: Authorization
+ *        in: header
+ *        description: JWT token for authentication
+ *        required: true
+ *        schema:
+ *          type: string
+ *    responses:
+ *      '200':
+ *        description: In a successful response return src of the image
+ *        content:
+ *           application/octet-stream:
+ *             schema: 
+ *               type: string
+ *               format: binary
+ */
+filesRouter.get('/images/:key', (req, res) => {
+    try{
+
+        console.log(req.params);
+        const key = req.params.key
+        const readStream = getFileStream(key).on('error', (err) => {
+            console.log(err);
+            res.send(err)}) 
+        readStream.pipe(res)
+    }
+    catch(err){
+        res.statusCode(err.statusCode)
+    }
+})
+
+/**
+ * @swagger
+ * /api/files/images:
+ *  post:
+ *    description: upload image to bucket
+ *    consumes:
+ *      - multipart/form-data
+ *    parameters:
+ *      - in: formData
+ *        name: image
+ *        type: file
+ *      - name: Authorization
+ *        in: header
+ *        description: JWT token for authentication
+ *        required: true
+ *        schema:
+ *          type: string
+ *    responses:
+ *      '200':
+ *        description: In a successful response return success message
+ *        content:
+ *           application/json:
+ *             schema: 
+ *               type: string 
+ */
+filesRouter.post('/images', upload.any('image'), async (req, res) => {
+    const files = req.files
+    console.log(files)
+    // apply filter
+    // resize 
+  
+    const result = await uploadFiles(files);
+    // await unlinkFile(file.path);
+    console.log(result);
+    const description = req.body.description
+    res.send(`/images/${result.Key}`)
+})
+
+/**
+ * @swagger
+ * /api/files/:
+ *  get:
+ *    description: Use to login need to send email and password
+ *    parameters:
+ *      - name: Authorization
+ *        in: header
+ *        description: JWT token for authentication
+ *        required: true
+ *        schema:
+ *          type: string
+ *    responses:
+ *      '200':
+ *        description: In a successful response return token
+ *        content:
+ *           application/json:
+ *             schema:
+ *               type: string
+ *      '400':
+ *        description: In a successful response return token
+ *        content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ */
 
 filesRouter.get('/', async (req, res) => {
     try {
@@ -24,27 +136,38 @@ filesRouter.get('/', async (req, res) => {
     }
 })
 
-filesRouter.post('/test-s3', upload.any("files"), async (req, res) => {
-
-    try {
-        // const filesPathes = await getFilesPathes(req.files)
-        res.send(urlImags)
-        openProject(req.files, filesPathes, { ...req.body })
-    }
-    catch (err) {
-        sendError(res, err)
-    }
-})
-
-filesRouter.post('/test', upload.any("files"), async (req, res) => {
-
-    try {
-        res.send(urlImags)
-    }
-    catch (err) {
-        sendError(res, err)
-    }
-})
+/**
+ * @swagger
+ * /api//:dirDate/:dir:
+ *  get:
+ *    description: Use to login need to send email and password
+ *    parameters:
+ *      - name: Authorization
+ *        in: header
+ *        description: JWT token for authentication
+ *        required: true
+ *        schema:
+ *          type: string
+ *      - name: dirDate
+ *        in: params
+ *        required: true
+ *      - name: dir
+ *        in: params
+ *        required: true
+ *    responses:
+ *      '200':
+ *        description: In a successful response return token
+ *        content:
+ *           application/json:
+ *             schema:
+ *               type: string
+ *      '400':
+ *        description: In a successful response return token
+ *        content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ */
 
 filesRouter.get('/:dirDate/:dir', upload.array("files"), async (req, res) => {
     try {
@@ -61,36 +184,12 @@ filesRouter.get('/:dirDate/:dir', upload.array("files"), async (req, res) => {
     }
 })
 
-filesRouter.post('/', upload.any("files"), async (req, res) => {
-    try {
-        const user = await userService.getUser(req.body.email)
-        const date = new Date()
-        fs.mkdirSync(`./upload/${Number(date)}`)
-        fs.mkdirSync(`./upload/${Number(date)}/original`)
-        fs.mkdirSync(`./upload/${Number(date)}/process`)
-        const files = req.files
-        files.forEach((v, i) => {
-            if (v.mimetype === `image/png`) {
-                fs.renameSync(`./upload/${v.filename}`, `./upload/${Number(date)}/original/${i}.png`)
-                if (!fs.existsSync(`./upload/${Number(date)}/original/${i}.png`)) throw { code: 500, message: `can't create file` }
-            }
-            else {
-                fs.unlinkSync(`./upload/${v.filename}`)
-            }
-        })
-        //missing api from server
-        files.forEach((v, i) => {
-            if (v.mimetype === `image/png`) {
-                fs.copyFileSync(`./upload/${Number(date)}/original/${i}.png`, `./upload/${Number(date)}/process/${i}.png`,)
-                if (!fs.existsSync(`./upload/${Number(date)}/process/${i}.png`)) throw { code: 500, message: `can't create file` }
-            }
-        })
-        const isCreated = await projectService.createProject(user._id, { root: `./upload/${Number(date)}`, runIspSettings: { ...req.body }, createDate: date })
-        if (!isCreated) throw { code: 500, message: `can't create project` }
-        const urlFiles = fs.readdirSync(`./upload/${Number(date)}/process`).map((v) => {
-            return `/api/files/upload/${req.params.dirDate}/${req.params.dir}/${v}`
-        })
-        res.send({ urlFiles })
+filesRouter.post('/', upload.any("files"), async (req,res)=>{
+
+    try{
+       const src= await uploadRewFiles (req)
+     
+        res.send({src})
 
     }
     catch (err) {
@@ -110,5 +209,3 @@ filesRouter.put('/', async (req, res) => {
 })
 
 module.exports = filesRouter
-
-

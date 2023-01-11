@@ -1,5 +1,7 @@
 const fs = require('fs')
 const S3 = require('aws-sdk/clients/s3')
+const { log } = require('console')
+
 
 const bucketName = process.env.AWS_BUCKET_NAME
 const region = process.env.AWS_BUCKET_REGION
@@ -12,29 +14,45 @@ const s3 = new S3({
   secretAccessKey
 })
 
-// uploads a file to s3
-function uploadFile(file) {
-  const fileStream = fs.createReadStream(file.path)
-
-  const uploadParams = {
-    Bucket: bucketName,
-    Body: fileStream,
-    Key: file.filename
-  }
-
-  return s3.upload(uploadParams).promise()
+// uploads a files to s3
+const uploadFiles = async (files, path)=> { // array of files to upload and path to location of the files in S3
+  
+    const params = files.map(file => {
+        return {
+            Bucket: bucketName,
+            Key: "/"+file.path,
+            Body: fs.createReadStream(file.path) // ?????
+        }
+    })
+    return await Promise.all(params.map(param => s3.upload(param).promise()))
 }
-exports.uploadFile = uploadFile
+exports.uploadFiles=uploadFiles
+// #################################################################
 
-
+async function showInFolder(path){
+    const params = {
+        Bucket:bucketName,
+    }
+    s3.listObjectsV2(params,(err, data) => {
+        log(err)
+        log(`
+            ${bucketName},
+            ${region},`
+        )
+        console.log(data);
+        return data;
+    })
+}
+exports.showInFolder=showInFolder
 // downloads a file from s3
-function getFileStream(fileKey) {
-  const downloadParams = {
-    Key: fileKey,
-    Bucket: bucketName
-  }
+function getFileStream(path) {
+    console.log(path);
+    const downloadParams = {
+        Bucket: bucketName,
+        Key: path
+    };
+    
 
   return s3.getObject(downloadParams).createReadStream()
 }
-exports.getFileStream = getFileStream
-
+exports.getFileStream=getFileStream

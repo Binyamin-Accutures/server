@@ -28,6 +28,7 @@ const saveSettings = async (folder,data) => {
     return errMessage.SUCCESS
 }
 
+
 // const getPathes = ()
 
 module.exports={getFilesPathes,saveSettings,openProject}
