@@ -10,7 +10,8 @@ const projectService = require('../BL/project.service');
 const { sendError } = require('../errController');
 
 const {uploadRewFiles, saveIspObj,uploadFiles ,getAllFilesInFolder} = require("../BL/files.service")
-const { uploadFile, getFileStream } = require('../s3')
+const { uploadFile, getFileStream } = require('../s3');
+const { json } = require('express');
 
 const urlImags = ["https://cdn.pixabay.com/photo/2023/01/05/22/36/ai-generated-7700016__340.png",
 "https://cdn.pixabay.com/photo/2015/10/01/17/17/car-967387__340.png",
@@ -136,6 +137,11 @@ filesRouter.post('/test',upload.any("files"), async (req,res)=>{
 })
 
 
+//example: insid the body:
+// jsonFile ={
+//     "root": "./upload/davidhakak19@gmail.com/1673442381937",
+//     "runIspSettings": {"blablabla": "blablabla"},
+//     "user": "davidhakak19@gmail.com"}
 
 filesRouter.post('/runisp', async (req,res)=>{
 

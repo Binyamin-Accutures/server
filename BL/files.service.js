@@ -49,24 +49,34 @@ return [{src},{projProps}]
 }
 
 const saveIspObj = async (props)=>{
-  const exict = await  projectsCtrl.read({props:root.root,email:props.email}) 
+  const exict = await  projectsCtrl.readOne({root:props.root}) 
   const sentIspObj = await projectsCtrl.updateAndReturn (exict[0]._id,{ runIspSettings :props.runIspSettings})
 return sentIspObj.runIspSettings
 }
 
-const sendToRemoteServer = async (props)=>{
-// const props ={root: "./upload/davidhakak19@gmail.com/1673442381937"}
-  const project  =  await projectsCtrl.readOne({root:"./upload/davidhakak19@gmail.com/1673442381937"}); 
-  console.log("************",project)  
-  const runIsp= project.runIspSettings
-const originalFiles =  await getAllFilesInFolder (`${project.root.slice(0,2)}`)
-console.log("************",originalFiles)  
+const sendToRemoteServer = async (root)=>{
+  try{
 
-  
-  // const res = await axios.post(serverUrl,originalFiles)
+    const project  =  await projectsCtrl.readOne({root:root}); 
+    const runIsp= project.runIspSettings
+    theRoot = `${project.root.slice(2)}/original`
+    const originalFiles =  await getAllFilesInFolder (theRoot)
+    
+    const res = await axios.post(serverUrl,originalFiles)
+    const processedFiles =res.data
+      if (processedFiles){
+      saveToProj= await  projectsCtrl.updateAndReturn (project._id,{ urlafterRunIsp :processedFiles})
+      if (saveToProj) return {processedFiles,root:project.root }
+      }
+      else throw error("no files")
+  }catch(err){
+
+
+  }
+return processedFiles 
 }
 
-sendToRemoteServer()
+// sendToRemoteServer()
 
 
 const getAllFilesInFolder = async(requestedFolder)=>{
