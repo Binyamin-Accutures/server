@@ -67,15 +67,14 @@ userRouter.post("/login", async (req, res) => {
  *        description: user not authorized
  */
 
-userRouter.get('/',auth.validToken, async (req, res) => {
-    try {
-        const user = await userService.getUser(req.email);
-        res.status(200).send(user)
-    }
-    catch (err) {
-        sendError(res,err)
-    }
-})
+userRouter.get("/", auth.validToken, async (req, res) => {
+  try {
+    const user = await userService.getUser(req.email);
+    res.status(200).send(user);
+  } catch (err) {
+    sendError(res, err);
+  }
+});
 
 /**
  * @swagger
@@ -102,21 +101,23 @@ userRouter.get('/',auth.validToken, async (req, res) => {
  *        description: In a successful response return token
  *        content:
  *           application/json:
- *             schema: 
- *               type: string   
+ *             schema:
+ *               type: string
  *      '400':
  *        description: missing data
  *        content:
  *           application/json:
- *             schema: 
- *               type: string   
+ *             schema:
+ *               type: string
  */
-
 
 userRouter.get("/forgot", async (req, res) => {
   try {
-    const userExist = await userService.getUserAndUpdateTokenForResetPass(req.query.email);
-      res.send(userExist);
+    const userExist =
+      await userService.getUserAndUpdateTokenAndSendEmailForResetPass(
+        req.query.email
+      );
+    res.send(userExist);
   } catch (err) {
     sendError(res, err);
   }
@@ -127,6 +128,27 @@ userRouter.post("/register", async (req, res) => {
     const user = await userService.createUser(req.body);
     res.status(200).send(user);
   } catch (err) {
+    sendError(res, err);
+  }
+});
+
+userRouter.post("/changepassword", async (req, res) => {
+  try {
+    const user = await userService.updatePass(req.body);
+    res.status(200).send(user);
+  } catch (err) {
+    sendError(res, err);
+  }
+});
+
+userRouter.get("/:email/renew/:token", async (req, res) => {
+  try {
+    const tokenForReseExist = await userService.checkRestePassToken(
+      req.params.email,
+      req.params.token
+    );
+    res.status(200).send(tokenForReseExist);
+  } catch (error) {
     sendError(res, err);
   }
 });

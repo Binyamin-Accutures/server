@@ -19,8 +19,8 @@ async function findUser(filter) {
   return await userData.findOne(filter).populate('projects');
 }
 
-async function update(id, newData) {
-  return await userData.updateOne({ _id: id}, newData).populate("projects")
+async function update(email, newData) {
+  return await userData.updateOne({ email: email}, newData).populate("projects")
 }
 
 async function updateAndReturn(id, newData){
