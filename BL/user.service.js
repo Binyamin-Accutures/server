@@ -4,11 +4,7 @@ const bcrypt = require('bcrypt')
 const {checkData} = require('../checkController')
 const { errMessage } = require('../errController')
 
-<<<<<<< HEAD
-const saltRounds = Number(process.env.SALT_ROUN)||10
-=======
 const saltRounds = Number(process.env.SALT_ROUNDS)||10;
->>>>>>> 304b8642fdd2cc351a2b0129753c3cbec801547c
 
 const login = async (data) => {
   checkData(data,['email', 'password'])
