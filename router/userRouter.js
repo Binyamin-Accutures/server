@@ -78,6 +78,40 @@ userRouter.get('/',auth.validToken, async (req, res) => {
     }
 })
 
+/**
+ * @swagger
+ * /api/user/register:
+ *  post:
+ *    description: Use to create a new user
+ *    parameters:
+ *      - name: user
+ *        in: body
+ *        description: The user object
+ *        required: true
+ *        schema:
+ *          type: object
+ *          properties:
+ *            email:
+ *              type: string
+ *              format: email
+ *            firstPssword:
+ *              type: string
+ *            secondPssword:
+ *              type: string
+ *    responses:
+ *      '200':
+ *        description: In a successful response return token
+ *        content:
+ *           application/json:
+ *             schema: 
+ *               type: string   
+ *      '400':
+ *        description: missing data
+ *        content:
+ *           application/json:
+ *             schema: 
+ *               type: string   
+ */
 
 userRouter.post('/register',async (req, res) => {
     try {
