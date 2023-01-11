@@ -1,9 +1,15 @@
-<<<<<<< HEAD
-const express = require('express')
-const app = express() 
+const express = require('express');
+const filesRouter = express.Router()
+const multer = require(`multer`);
+const upload = multer({dest:"./upload"})
+const userService = require('../BL/user.service');
+const { sendError } = require('../errController');
+const {createProject} = require("./project.service")
 const AdmZip = require('adm-zip');
 const fs = require('fs')
 const uploadDir = fs.readdirSync(__dirname+"/uploads");
+
+const app = express()
 const port = 6700 
 const cors = require('cors');
 
@@ -31,15 +37,6 @@ app.all('/api/createZIP', (req, res) => {
 })
  
 app.listen(port, () => console.log(`Server started on port ${port}`))
-=======
-const express = require('express');
-const filesRouter = express.Router()
-const multer = require(`multer`);
-const upload = multer({dest:"./upload"})
-const fs = require('fs');
-const userService = require('../BL/user.service');
-const { sendError } = require('../errController');
-const {createProject} = require("./project.service")
 
 
 const uploadRewFiles = async (req)=>{
