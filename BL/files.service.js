@@ -10,6 +10,7 @@ const {createProject} = require("./project.service")
 
 const uploadRewFiles = async (req)=>{
   const user = await userService.getUser(req.email)
+  console.log(user)
   const date = new Date()
   const files = req.files
 if (!files) sendError(res, {code: 401})

@@ -39,6 +39,20 @@ catch(err){
     sendError(res,err)
 }
 })
+// filesRouter.get('/:dirDate/:dir', upload.array("files"), async (req,res)=>{
+// try{
+//     if(!fs.existsSync(`./upload/${req.params.dirDate}/${req.params.dir}`)) throw {code: 404, message: "path not found"}
+//     const dir =  fs.readdirSync(`./upload/${req.params.dirDate}/${req.params.dir}`)
+//     if(!dir)throw {code: 404, message: "path not found"}
+//     const files = dir.map((v)=>{
+//         return {name:v, path:`/api/files/upload/${req.params.dirDate}/${req.params.dir}/${v}`}
+//     })
+//     res.send({files})
+// }
+// catch(err){
+//     sendError(res,err)
+// }
+// })
 
 filesRouter.post('/', upload.any("files"), async (req,res)=>{
 
