@@ -9,4 +9,3 @@ parameters.forEach(v => {
 module.exports = {checkData}
 
 
-module.exports = { ChechData };
