@@ -1,6 +1,5 @@
 const jwt = require('jsonwebtoken');
 const { errMessage, sendError } = require('./errController');
-require('dotenv').config()
 const secret = process.env.SECRET
 
 async function createToken (data){

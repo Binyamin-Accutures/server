@@ -16,12 +16,12 @@ async function findUserWithPass(filter) {
 }
 
 async function findUser(filter) {
+
   return await userData.findOne(filter).populate('projects');
 }
 
-
 async function update(id, newData) {
-  return await userData.updateOne({ _id: id}, newData,{new:true}).populate("projects")
+  return await userData.updateOne({ _id: id}, newData).populate("projects")
 }
 
 async function updateAndReturn(id, newData){
@@ -34,4 +34,4 @@ async function del(id) {
   return await update(id, { isActive: false });
 }
 
-module.exports = { create, read, update, del, findUser, updateAndReturn, findUserWithPass};
+module.exports = { create, read, update, del, findUser, updateAndReturn, findUserWithPass, };
