@@ -25,14 +25,15 @@ const uploadRewFiles = async (data) => {
       fs.unlinkSync(`./upload/${v.filename}`)
     }
   })
-  const project = await createProject(user._id,{root: `./${baseDir}`,createDate: date,})
-  if (!project) throw errMessage.PROJECT_NOT_FOUND
+  const project = await createProject(user._id, {root:`./${baseDir}`,createDate:date})
+  if (!project) throw errMessage.PROJECT_NOT_FOUND ////error
   return project
 }
 
-const saveRunIspObj = async (data) => {
-  checkData(data,["root","runIspSettings"]) 
-  return await projectController.updateAndReturnByAnyFilter({ root: data.root }, { runIspSettings: data.runIspSettings })
+
+const saveRunIspObj = async (data)=>{
+  checkData(data,["root","runIspSettings"])
+  return await projectsCtrl.updateAndReturn ({root:data.root},{ runIspSettings :data.runIspSettings})
 }
 
 // const sendToRemoteServer = async (root) => {
