@@ -5,7 +5,7 @@ const { checkData } = require("../checkController");
 const { errMessage } = require("../errController");
 const projectService = require ("./project.service")
 const saltRounds = Number(process.env.SALT_ROUNDS) || 10;
-
+///////////////////////////////////////////////////////////////
 const login = async (data) => {
   checkData(data, ["email", "password"]);
   let user = await userDL.findUserWithPass({email:data.email});
@@ -14,7 +14,7 @@ const login = async (data) => {
   let token = await auth.createToken(data.email);
   return token;
 };
-
+///////////////////////////////////////////////////////////////
 const createUser = async (data) => {
   checkData(data, ["email", "firstPassword", "secondPassword"]);
   if (data.firstPassword !== data.secondPassword)
@@ -26,7 +26,7 @@ const createUser = async (data) => {
   let token = await auth.createToken(data.email);
   return token;
 };
-
+///////////////////////////////////////////////////////////////
 const getUser = async (email) => {
   const user = await userDL.findUser({ email: email });
   if (!user) throw errMessage.USER_NOT_FOUND;

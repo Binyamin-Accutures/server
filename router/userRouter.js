@@ -33,7 +33,7 @@ const { sendError } = require("../errController");
  *             schema:
  *               type: string
  *      '400':
- *        description: In a successful response return token
+ *        description: bad request
  *        content:
  *           application/json:
  *             schema:
@@ -88,7 +88,7 @@ userRouter.post("/login", async (req, res) => {
 userRouter.post("/register", async (req, res) => {
   try {
     const user = await userService.createUser(req.body);
-    res.status(200).send(user);
+    res.send(user);
   } catch (err) {
     sendError(res, err);
   }

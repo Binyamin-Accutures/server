@@ -5,7 +5,6 @@ const express = require('express');
 const swaggerJsDoc = require("swagger-jsdoc");
 const swaggerUi = require("swagger-ui-express");
 const cors = require('cors');
-const { showInFolder } = require('./s3');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -17,7 +16,7 @@ const swaggerOptions = {
     info: {
       version: "1.0.0",
       title: "bottcamp accutures",
-      description: "bottcamp API Information",
+      description: "bootcamp API Information",
       contact: {
         name: "matanel vatkin",
         email: "matanelvatkin@gmail.com"
