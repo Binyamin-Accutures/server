@@ -25,7 +25,6 @@ const uploadRewFiles = async (data) => {
       fs.unlinkSync(`./upload/${v.filename}`)
     }
   })
-
   const project = await createProject(user._id,{root: `./${baseDir}`,createDate: date,})
   if (!project) throw errMessage.PROJECT_NOT_FOUND
   return project
@@ -59,7 +58,6 @@ const saveRunIspObj = async (data) => {
 // }
 
 const getAllFilesInFolder = async (requestedFolder) => {
-
   if (!fs.existsSync(`./${requestedFolder}`)) throw { code: 404, message: "path not found" }
   const dir = fs.readdirSync(`./${requestedFolder}`)
   if (!dir) throw { code: 404, message: "path not found" }

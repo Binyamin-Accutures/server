@@ -19,7 +19,7 @@ const errMessage = Object.freeze({
 
 const sendError = (res, err) => {
   console.log(err);
-  res.status(err.code||500).send(err.message||"try agien leter");
+  res.status(err.code||500).send(err.message||"try agien later");
 };
 module.exports = {
   errMessage,
