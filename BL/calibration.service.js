@@ -1,4 +1,5 @@
 const { errMessage } = require("../errController")
+const { showInFolder } = require("../s3")
 const { getProject, createProject, updateProjectById } = require("./project.service")
 const { getUser, updateUser } = require("./user.service")
 
@@ -28,7 +29,21 @@ const saveSettings = async (folder,data) => {
     return errMessage.SUCCESS
 }
 
+const setImagesToAccutur = async (data) => {
+    const images = showInFolder(data.root+"/original")
+    const formData = new FormData()
+    formData.append("files", images);
+    formData.append("runIspSettings",data.runIspSettings)
+    /*const urlPrcessed = await axios.post(`/api/Accotur`,formData,{headers: {
+              'Content-Type': 'multipart/form-data',
+              'Content-Disposition': 'attachment; filename=example.png'
+          }})
+     await updateProjectById(data._id,{urlAfterRunIsp: urlPrcessed})
+    return urlPrcessed
+          */
+         return true
+}
 
 // const getPathes = ()
 
-module.exports={getFilesPathes,saveSettings,openProject}
+module.exports={getFilesPathes,saveSettings,openProject,setImagesToAccutur}
