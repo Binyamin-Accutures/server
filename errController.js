@@ -13,6 +13,8 @@ const errMessage = Object.freeze({
   PASSWORDS_ARE_NOT_EQUAL: err(400, "passwords are not equal"),
   TOKEN_DID_NOT_CREATED: err(401, "token didn't created"),
   PROJECT_NOT_FOUND: err(400, "project not found"),
+  CAN_NOT_GET_URL: err(999, "can't get url"),
+  CAN_NOT_CREATE_FOLDER: err(999, "can't create folder"),
 });
 
 const sendError = (res, err) => {

@@ -36,19 +36,14 @@ const getUser = async (email) => {
 const getUserAndUpdateTokenForResetPass = async (email) => {
  const user =  await getUser(email);
   const token = bcrypt.hashSync(Date.now.toString(), saltRounds);
-  await userDL.updateProj(user._id, {
+  return await userDL.updateAndReturn(user._id, {
     resetPass: token,
   });
 };
 
 const getUserDirectories = async (email) => {
   let user = await getUser(email);
-  const directories = user.projects.map((v) => {
-    let dirName = projectService.getDirName(v.root);
-    return {
-      name: dirName,
-    };
-  });
+  const directories = user.projects.map((v) => {return {dirName: projectService.getDirName(v.root)}})
   return directories;
 };
 
@@ -59,10 +54,15 @@ const addProject = async (user_id, project) => {
   return updateRes;
 };
 
+const updateUser = async (user_id,newData) => {
+  const updateRes = await userDL.updateAndReturn(user_id,newData);
+  return updateRes;
+}
+
 const getUserAndPopulate = async (email) => {
   const user = await userDL.findUser({email : email})
     if (!user) throw errMessage.USER_NOT_FOUND;
     return user
 }
-module.exports = { createUser, getUser, login, getUserDirectories, addProject, getUserAndPopulate, getUserAndUpdateTokenForResetPass };
+module.exports = {updateUser, createUser, getUser, login, getUserDirectories, addProject, getUserAndPopulate, getUserAndUpdateTokenForResetPass };
 

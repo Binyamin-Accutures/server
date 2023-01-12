@@ -1,4 +1,3 @@
-const { error } = require("console");
 const { errMessage } = require("../errController");
 const userData = require("./user.model");
 
@@ -16,12 +15,11 @@ async function findUserWithPass(filter) {
 }
 
 async function findUser(filter) {
-
   return await userData.findOne(filter).populate('projects');
 }
 
 async function update(id, newData) {
-  return await userData.updateOne({ _id: id}, newData).populate("projects")
+  return await userData.updateOne({ _id: id}, newData)
 }
 
 async function updateAndReturn(id, newData){
