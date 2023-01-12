@@ -26,7 +26,7 @@ const uploadRewFiles = async (data) => {
     }
   })
 
-  const project = await createProject(user._id,{root: `./${baseDir}`,createDate: date,})
+  const project = await createProject(user._id,{root: `./${baseDir}`,createDate: date})
   if (!project) throw errMessage.PROJECT_NOT_FOUND
   return project
 }

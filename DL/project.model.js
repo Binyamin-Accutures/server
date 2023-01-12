@@ -5,6 +5,7 @@ const projectSchema = new mongoose.Schema({
 },
   runIspSettings: {
       type: Object,
+      default: [],
   },
   urlAfterRunIsp:[{type:String}],
   saveSettings: { 

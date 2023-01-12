@@ -9,7 +9,7 @@ const getProject = async (root) => {
 } 
 
 const createProject = async (user_id, data) =>{
-    checkData({user_id,...data},["root", "runIspSettings"])
+    checkData({user_id,...data},["root", "root"])
     const newProject = await projDL.create(data)
     const updateRes = await userDL.updateAndReturn(user_id, {
         $push: { projects: newProject._id },
