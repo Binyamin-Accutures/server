@@ -8,8 +8,6 @@ const { sendError } = require('../errController');
 const {createProject} = require("./project.service")
 const projectsCtrl = require ("../DL/project.controller"); 
 const { default: axios } = require('axios');
-// import {FormData, File} from "formdata-node" 
-// import fetch from "node-fetch"
 
 const uploadRewFiles = async (req,res)=>{
 

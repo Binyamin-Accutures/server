@@ -1,7 +1,9 @@
 const { checkData } = require('../checkController')
 const projDL = require ('../DL/project.controller')
-const { errMessage } = require('../errController')
-const userService = require ('./user.service')
+// const { errMessage } = require('../errController')
+const userService = require (`./user.service`)
+const userDL = require("../DL/user.controller");
+
 
 const getFile = async (root) => {
     const project = await projDL.readOne({root})
@@ -9,12 +11,12 @@ const getFile = async (root) => {
 } 
 
 const createProject = async (user_id, data) =>{
-
     checkData({user_id,...data},["root", "runIspSettings"])
-
     const newProject = await projDL.create(data)
-    const res = await userService.addProject(user_id, newProject)
-    return res
+    const updateRes = await userDL.updateAndReturn(user_id, {
+        $push: { projects: newProject._id },
+      });
+      return updateRes;
 }
 
 const updateProject = async (root,saveSettings) =>{
