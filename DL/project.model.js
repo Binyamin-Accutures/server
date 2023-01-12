@@ -1,24 +1,17 @@
 const mongoose = require("mongoose");
 const projectSchema = new mongoose.Schema({
- user:{
-  type:String,
-  required:true
- },
-  root:{ 
-  type:String,
-  required:true
+ root:{ 
+  type:String
 },
   runIspSettings: {
       type: Object,
-      required: true,
   },
-  urlafterRunIsp:[{type:String}],
+  urlAfterRunIsp:[{type:String}],
   saveSettings: { 
       type: Object,
   },
   createDate: {
     type: Date,
-    required:true
   },
   isActive: {
     type: Boolean,

@@ -6,8 +6,11 @@ const { sendError } = require("../errController");
 
 /**
  * @swagger
+ * tags:
+ *  name: user
  * /api/user/login:
  *  post:
+ *    tags: [user]
  *    description: Use to login need to send email and password
  *    parameters:
  *      - name: user
@@ -36,7 +39,6 @@ const { sendError } = require("../errController");
  *             schema:
  *               type: string
  */
-
 userRouter.post("/login", async (req, res) => {
   try {
     const token = await userService.login(req.body);
@@ -48,39 +50,11 @@ userRouter.post("/login", async (req, res) => {
 
 /**
  * @swagger
- * /api/user/:
- *  get:
- *    description: Use to get user information
- *    parameters:
- *      - name: Authorization
- *        in: header
- *        description: JWT token for authentication
- *        required: true
- *        schema:
- *          type: string
- *    responses:
- *      '200':
- *        description: In a successful response return user information
- *      '401':
- *        description: token isn't exists
- *      '400':
- *        description: user not authorized
- */
-
-userRouter.get('/',auth.validToken, async (req, res) => {
-    try {
-        const user = await userService.getUser(req.email);
-        res.status(200).send(user)
-    }
-    catch (err) {
-        sendError(res,err)
-    }
-})
-
-/**
- * @swagger
+ * tags:
+ *  name: user
  * /api/user/register:
  *  post:
+ *    tags: [user]
  *    description: Use to create a new user
  *    parameters:
  *      - name: user
@@ -111,17 +85,6 @@ userRouter.get('/',auth.validToken, async (req, res) => {
  *             schema: 
  *               type: string
  */
-
-
-userRouter.get("/forgot", async (req, res) => {
-  try {
-    const userExist = await userService.getUserAndUpdateTokenForResetPass(req.query.email);
-      res.send(userExist);
-  } catch (err) {
-    sendError(res, err);
-  }
-});
-
 userRouter.post("/register", async (req, res) => {
   try {
     const user = await userService.createUser(req.body);
@@ -131,4 +94,73 @@ userRouter.post("/register", async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * tags:
+ *  name: user
+ * /api/user/:
+ *  get:
+ *    tags: [user]
+ *    description: Use to get user information
+ *    parameters:
+ *      - name: Authorization
+ *        in: header
+ *        description: JWT token for authentication
+ *        required: true
+ *        schema:
+ *          type: string
+ *    responses:
+ *      '200':
+ *        description: In a successful response return user information
+ *      '401':
+ *        description: token isn't exists
+ *      '400':
+ *        description: user not authorized
+ */
+userRouter.get('/',auth.validToken, async (req, res) => {
+    try {
+        const user = await userService.getUser(req.email);
+        res.status(200).send(user)
+    }
+    catch (err) {
+        sendError(res,err)
+    }
+})
+
+/**
+ * @swagger
+ * tags:
+ *  name: user
+ * /api/user/forgot:
+ *  get:
+ *    tags: [user]
+ *    description: Use to create a new password
+ *    parameters:
+ *      - name: email
+ *        in: query
+ *        description: The user email
+ *        required: true
+ *        type: string
+ *    responses:
+ *      '200':
+ *        description: In a successful response return token
+ *        content:
+ *           application/json:
+ *             schema: 
+ *               type: string   
+ *      '400':
+ *        description: missing data
+ *        content:
+ *           application/json:
+ *             schema: 
+ *               type: string
+ */
+userRouter.get("/forgot", async (req, res) => {
+  try {
+    const userExist = await userService.getUserAndUpdateTokenForResetPass(req.query.email);
+      res.send(userExist);
+  } catch (err) {
+    sendError(res, err);
+  }
+});
 module.exports = userRouter;
