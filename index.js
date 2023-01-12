@@ -37,5 +37,5 @@ app.use('/api', mainRouter);
 app.use('/',express.static('upload'))
 
 app.listen(PORT, () => {
-  console.log('server listen to ' +PORT);
+  console.log("server listen to " + PORT);
 });
