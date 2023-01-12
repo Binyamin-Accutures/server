@@ -4,6 +4,7 @@ const {errMessage } = require('../errController');
 const { createProject } = require("./project.service")
 const projectController = require("../DL/project.controller");
 const {checkData} = require('../checkController');
+const { compare } = require('bcrypt');
 
 const uploadRewFiles = async (data) => {
   checkData(data,["email","files"])

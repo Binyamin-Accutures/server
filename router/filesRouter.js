@@ -352,7 +352,7 @@ filesRouter.get('/projects', async (req, res) => {
  *             schema:
  *               type: object
  */
-filesRouter.get('/:projectName/:folder', async (req,res)=>{
+filesRouter.get('/:user/:projectName/:folder', async (req,res)=>{
     try{
     const requestedFolder = `upload/${req.email}/${req.params.projectName}/${req.params.folder}`
     
