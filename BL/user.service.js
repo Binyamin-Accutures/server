@@ -7,7 +7,7 @@ const sendEmail = require("../BL/hellpers/email");
 const projectService = require ("./project.service")
 const saltRounds = Number(process.env.SALT_ROUNDS) || 10;
 
-///////////////////////////////////////////////////////////////
+
 const login = async (data) => {
   checkData(data, ["email", "password"]);
   let user = await userDL.findUserWithPass({ email: data.email });
@@ -16,7 +16,7 @@ const login = async (data) => {
   let token = await auth.createToken(data.email);
   return token;
 };
-///////////////////////////////////////////////////////////////
+
 const createUser = async (data) => {
   checkData(data, ["email", "firstPassword", "secondPassword"]);
   if (data.firstPassword !== data.secondPassword)
@@ -28,7 +28,7 @@ const createUser = async (data) => {
   let token = await auth.createToken(data.email);
   return token;
 };
-///////////////////////////////////////////////////////////////
+
 const getUser = async (email) => {
   const user = await userDL.findUser({ email: email });
   if (!user) throw errMessage.USER_NOT_FOUND;
@@ -42,7 +42,7 @@ const getUserAndUpdateTokenAndSendEmailForResetPass = async (email) => {
   const done = await userDL.update(user._id, {
     resetPass: token,
   });
-  if (!done) throw "create token for change pass failed";
+  if (!done) throw errMessage.TOKEN_DID_NOT_CREATED
   const url = `${process.env.BASE_URL}/renew/?token=${token}`;
   const msg = {
     email: email,
@@ -53,6 +53,7 @@ const getUserAndUpdateTokenAndSendEmailForResetPass = async (email) => {
   await sendEmail(msg);
   return "email send to verify";
 };
+
 
 const checkRestePassToken = async (token) => {
   const user = await userDL.findUser({ resetPass: token });

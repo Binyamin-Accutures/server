@@ -1,7 +1,7 @@
 const { errMessage } = require("../errController");
 const userData = require("./user.model");
 
-///////////////////////////////////////////////////////////////
+
 async function create(data) {
   return await userData.create({email: data.email,password: data.firstPassword});
 }
@@ -9,11 +9,11 @@ async function create(data) {
 async function read(filter) {
   return await userData.find(filter).populate("projects");
 }
-///////////////////////////////////////////////////////////////
+
 async function findUserWithPass(filter) {
   return await userData.findOne(filter).select("+password");
 }
-///////////////////////////////////////////////////////////////
+
 async function findUser(filter) {
   return await userData.findOne(filter).populate('projects');
 }
