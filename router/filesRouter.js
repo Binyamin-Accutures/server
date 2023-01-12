@@ -463,7 +463,7 @@ filesRouter.post('/save', upload.any("files"), async (req, res) =>{
         const files = req.files
         console.log(files)
         let path = req.body.path+"/"
-        let result = await saveResults(files, path);
+        let result = await saveResults(files, path,res);
         res.send(result) 
 
     }

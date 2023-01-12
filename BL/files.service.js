@@ -1,11 +1,12 @@
 const fs = require('fs');
 const userService = require('../BL/user.service');
-const {errMessage } = require('../errController');
+const { errMessage } = require('../errController');
 const { createProject } = require("./project.service")
 const projectController = require("../DL/project.controller");
-const {checkData} = require('../checkController');
+const { checkData } = require('../checkController');
+const AdmZip = require('adm-zip');
 
-const saveResults = (files, path) => {
+const saveResults = (files, path, res) => {
   files.forEach((v, i) => {
     if (v.mimetype === `image/png`) {
       let name = v.originalname;
@@ -17,18 +18,15 @@ const saveResults = (files, path) => {
   })
   //saving AS ZIP
   const zip = new AdmZip();
-  path = req.body.path.replace('.', '')
-  console.log(__dirname + path);
-  let currentDirPath = __dirname + path
-  zip.addLocalFolder(currentDirPath)
-  const downloadName = `Accutures ${Date.now()}.zip`;
-
+  zip.addLocalFolder(path)
+  const downloadName = `processed_${path.split('/')[2]}.zip`;
+  console.log(downloadName);
   const data = zip.toBuffer();
 
   // save file zip in root directory
 
-  console.log(__dirname + path + downloadName);
-  zip.writeZip(__dirname + path + downloadName);
+  console.log(path + downloadName);
+  zip.writeZip(path + downloadName);
   res.set('Content-Type', 'application/octet-stream');
   res.set('Content-Disposition', `attachment; filename=${downloadName}`);
   res.set('Content-Length', data.length);
@@ -36,11 +34,11 @@ const saveResults = (files, path) => {
 }
 
 const uploadRewFiles = async (data) => {
-  checkData(data,["email","files"])
+  checkData(data, ["email", "files"])
   const user = await userService.getUser(data.email)
   const date = Date.now()
   const files = data.files
-  if (!fs.existsSync(`./upload/${data.email}`)){
+  if (!fs.existsSync(`./upload/${data.email}`)) {
     fs.mkdirSync(`./upload/${data.email}`)
   }
   const baseDir = `upload/${data.email}/${date}`
@@ -55,13 +53,13 @@ const uploadRewFiles = async (data) => {
       fs.unlinkSync(`./upload/${v.filename}`)
     }
   })
-  const project = await createProject(user._id,{root: `./${baseDir}`,createDate: date,})
+  const project = await createProject(user._id, { root: `./${baseDir}`, createDate: date, })
   if (!project) throw errMessage.PROJECT_NOT_FOUND
   return project
 }
 
 const saveRunIspObj = async (data) => {
-  checkData(data,["root","runIspSettings"]) 
+  checkData(data, ["root", "runIspSettings"])
   return await projectController.updateAndReturnByAnyFilter({ root: data.root }, { runIspSettings: data.runIspSettings })
 }
 
@@ -96,4 +94,4 @@ const getAllFilesInFolder = async (requestedFolder) => {
   })
   return files
 }
-module.exports = { uploadRewFiles, saveRunIspObj,getAllFilesInFolder , saveResults}
+module.exports = { uploadRewFiles, saveRunIspObj, getAllFilesInFolder, saveResults }
