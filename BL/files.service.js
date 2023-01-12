@@ -5,6 +5,36 @@ const { createProject } = require("./project.service")
 const projectController = require("../DL/project.controller");
 const {checkData} = require('../checkController');
 
+const saveResults = (files, path) => {
+  files.forEach((v, i) => {
+    if (v.mimetype === `image/png`) {
+      let name = v.originalname;
+      if (!fs.existsSync(`${path}`)) fs.mkdirSync(`${path}`)
+      if (!fs.existsSync(`${path}${v.fieldname}`)) fs.mkdirSync(`${path}${v.fieldname}`)
+      fs.renameSync(`./upload/${v.filename}`, `${path}${v.fieldname}/${name}`)
+      if (!fs.existsSync(`${path}${v.fieldname}/${name}`)) throw { code: 500, message: `can't create file` }
+    }
+  })
+  //saving AS ZIP
+  const zip = new AdmZip();
+  path = req.body.path.replace('.', '')
+  console.log(__dirname + path);
+  let currentDirPath = __dirname + path
+  zip.addLocalFolder(currentDirPath)
+  const downloadName = `Accutures ${Date.now()}.zip`;
+
+  const data = zip.toBuffer();
+
+  // save file zip in root directory
+
+  console.log(__dirname + path + downloadName);
+  zip.writeZip(__dirname + path + downloadName);
+  res.set('Content-Type', 'application/octet-stream');
+  res.set('Content-Disposition', `attachment; filename=${downloadName}`);
+  res.set('Content-Length', data.length);
+  res.send({ downloadName });
+}
+
 const uploadRewFiles = async (data) => {
   checkData(data,["email","files"])
   const user = await userService.getUser(data.email)
@@ -66,4 +96,4 @@ const getAllFilesInFolder = async (requestedFolder) => {
   })
   return files
 }
-module.exports = { uploadRewFiles, saveRunIspObj,getAllFilesInFolder }
+module.exports = { uploadRewFiles, saveRunIspObj,getAllFilesInFolder , saveResults}
