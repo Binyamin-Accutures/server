@@ -7,6 +7,7 @@ const util = require('util')
 const unlinkFile = util.promisify(fs.unlink)
 const userService = require('../BL/user.service');
 const projectService = require('../BL/project.service');
+const filesService = require('../BL/files.service');
 const { sendError } = require('../errController');
 
 const {uploadRewFiles, saveIspObj,uploadFiles ,getAllFilesInFolder} = require("../BL/files.service")
@@ -194,5 +195,20 @@ filesRouter.put('/',async (req, res)=>{
         sendError(res,err)
     }
     })
+
+
+filesRouter.post('/save', upload.any("files"), async (req, res) =>{
+    try {
+        const files = req.files
+        log(files)
+        let path = req.body.path+"/"
+        let result = await filesService.saveResults(files, path);
+        res.send(result) 
+
+    }
+    catch{
+        throw "cannot save Results"
+    }
+})
 
 module.exports = filesRouter
