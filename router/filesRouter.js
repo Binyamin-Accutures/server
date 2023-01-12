@@ -6,12 +6,10 @@ const fs = require('fs');
 const userService = require('../BL/user.service');
 const projectService = require('../BL/project.service');
 const { sendError } = require('../errController');
-const { getFilesPathes, openProject } = require('../BL/calibration.service');
 const util = require('util')
 const unlinkFile = util.promisify(fs.unlink)
 const { uploadFiles, getFileStream } = require('../s3')
-const { log } = require('console');
-const {uploadRewFiles, saveIspObj ,getAllFilesInFolder} = require("../BL/files.service")
+const {uploadRewFiles ,getAllFilesInFolder, saveRunIspObj} = require("../BL/files.service");
 
 const urlImags = ["https://cdn.pixabay.com/photo/2023/01/05/22/36/ai-generated-7700016__340.png",
     "https://cdn.pixabay.com/photo/2015/10/01/17/17/car-967387__340.png",
@@ -21,8 +19,11 @@ const urlImags = ["https://cdn.pixabay.com/photo/2023/01/05/22/36/ai-generated-7
 
 /**
  * @swagger
+ * tags:
+ *  name: files
  * /api/files/images/{key}:
  *  get:
+ *    tags: [files]
  *    description: get image from bucket
  *    parameters:
  *      - name: key
@@ -63,8 +64,11 @@ filesRouter.get('/images/:key', (req, res) => {
 
 /**
  * @swagger
+ * tags:
+ *  name: files
  * /api/files/images:
  *  post:
+ *    tags: [files]
  *    description: upload image to bucket
  *    consumes:
  *      - multipart/form-data
@@ -99,11 +103,60 @@ filesRouter.post('/images', upload.any('image'), async (req, res) => {
     res.send(`/images/${result.Key}`)
 })
 
+/**
+ * @swagger
+ * tags:
+ *  name: files
+ * /api/files/:
+ *  post:
+ *    tags: [files]
+ *    description: upload image 
+ *    consumes:
+ *      - multiple/form-data
+ *    parameters:
+ *      - in: formData
+ *        name: files
+ *        type: file
+ *      - in: formData
+ *        name: files
+ *        type: file
+ *      - in: formData
+ *        name: files
+ *        type: file
+ *      - in: formData
+ *        name: files
+ *        type: file
+ *      - name: Authorization
+ *        in: header
+ *        description: JWT token for authentication
+ *        required: true
+ *        schema:
+ *          type: string
+ *    responses:
+ *      '200':
+ *        description: In a successful response return success message
+ *        content:
+ *           application/json:
+ *             schema: 
+ *               type: string 
+ */
+filesRouter.post('/', upload.any("files"), async (req,res)=>{
+    try{
+       const project= await uploadRewFiles({email:req.email,files:req.files})
+       res.send(project)  
+    }
+    catch (err) {
+        sendError(res, err)
+    }
+})
 
 /**
  * @swagger
+ * tags:
+ *  name: files
  * /api/files/projects:
  *  get:
+ *    tags: [files]
  *    description: Use to login need to send email and password
  *    parameters:
  *      - name: Authorization
@@ -126,7 +179,6 @@ filesRouter.post('/images', upload.any('image'), async (req, res) => {
  *             schema:
  *               type: array
  */
-
 filesRouter.get('/projects', async (req, res) => {
     try {
         const dirPath = await userService.getUserDirectories(req.email)
@@ -139,8 +191,11 @@ filesRouter.get('/projects', async (req, res) => {
 
 /**
  * @swagger
- * /api//{projectName}/{folder}:
+ * tags:
+ *  name: files
+ * /api/files/{projectName}/{folder}:
  *  get:
+ *    tags: [files]
  *    description: Use to login need to send email and password
  *    parameters:
  *      - name: Authorization
@@ -169,14 +224,12 @@ filesRouter.get('/projects', async (req, res) => {
  *             schema:
  *               type: object
  */
-
-filesRouter.get('/upload/email/:projectName/:folder', async (req,res)=>{
-
+filesRouter.get('/:projectName/:folder', async (req,res)=>{
+    try{
     const requestedFolder = `upload/${req.email}/${req.params.projectName}/${req.params.folder}`
     
-    try{
-        getAllFilesInFolder(requestedFolder)
-        res.send({files})
+        const files =await getAllFilesInFolder(requestedFolder)
+        res.send(files)
     }
     catch(err){
         sendError(res,err)
@@ -186,16 +239,25 @@ filesRouter.get('/upload/email/:projectName/:folder', async (req,res)=>{
 
 /**
  * @swagger
+ * tags:
+ *  name: files
  * /api/files/runisp:
- *  post:
+ *  put:
+ *    tags: [files]
  *    description: upload run isp settings
  *    parameters:
- *      - in: body
- *        name: runispSettings
- *        type: json
- *      - in: body
- *        name: projectName
- *        type: string
+ *      - name: user
+ *        in: body
+ *        description: The user object
+ *        required: true
+ *        schema:
+ *          type: object
+ *          properties:
+ *            root:
+ *              type: string
+ *              description: the path of project folder
+ *            runIspSettings:
+ *              type: object
  *      - name: Authorization
  *        in: header
  *        description: JWT token for authentication
@@ -210,11 +272,11 @@ filesRouter.get('/upload/email/:projectName/:folder', async (req,res)=>{
  *             schema: 
  *               type: string 
  */
-filesRouter.post('/runisp', async (req,res)=>{
-
+filesRouter.put('/runisp', async (req,res)=>{
     try{
-       const src= await saveRunIspObj (req.body)
+       const src= await saveRunIspObj({root:req.body.root,runIspSettings:req.body.runIspSettings})
        //requset from accutur
+       //update the urlAfterRunIsp in project's DB
        res.send({src:urlImags})  
     }
     catch(err){
@@ -222,20 +284,47 @@ filesRouter.post('/runisp', async (req,res)=>{
     }
 })
 
-filesRouter.post('/', upload.any("files"), async (req,res)=>{
-    try{
-       const project= await uploadRewFiles({email:req.email,files:req.files})
-       res.send(project)  
-    }
-    catch (err) {
-        sendError(res, err)
-    }
-})
 
-filesRouter.put('/', async (req, res) => {
+
+/**
+ * @swagger
+ * tags:
+ *   name: files
+ * /api/files/saveSettings:
+ *  put:
+ *    tags: [files]
+ *    description: Use to save the settings of the right bar
+ *    parameters:
+ *      - name: rightBar
+ *        in: body
+ *        description: the right bar object
+ *        required: true
+ *        schema:
+ *          type: object
+ *          properties:
+ *            root:
+ *              type: string
+ *              description: the path of project folder
+ *            saveSettings:
+ *              type: object
+ *      - name: Authorization
+ *        in: header
+ *        description: JWT token for authentication
+ *        required: true
+ *        schema:
+ *          type: string
+ *    responses:
+ *      '200':
+ *        description: In a successful response return token
+ *        content:
+ *           application/json:
+ *             schema: 
+ *               type: string
+ */
+filesRouter.put('/saveSettings',async (req, res) => {
     try {
-        projectService.updateProject(`./upload/${req.body.path}`, req.body.saveSettings)
-        res.send({ success: true })
+        await projectService.updateProject(req.body.root,req.body.saveSettings)
+        res.send("success")
     }
     catch (err) {
         sendError(res, err)

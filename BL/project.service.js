@@ -1,7 +1,7 @@
 const { checkData } = require('../checkController')
 const projDL = require ('../DL/project.controller')
+const userDL = require('../DL/user.controller')
 const { errMessage } = require('../errController')
-const userService = require ('./user.service')
 
 const getProject = async (root) => {
     const project = await projDL.readOne({root})
@@ -11,7 +11,9 @@ const getProject = async (root) => {
 const createProject = async (user_id, data) =>{
     checkData({user_id,...data},["user_id","root","createDate"])
     const newProject = await projDL.create(data)
-    await userService.addProject(user_id, newProject)
+    await userDL.updateAndReturn(user_id, {
+        $push: { projects: newProject._id },
+      });
     return newProject
 }
 
@@ -32,4 +34,4 @@ const getDirName = (path)=>{
     return path.replace("./upload/","")
 }
 
-module.exports = { getFile, createProject, updateProject,getDirName,getProject,updateProjectById }
+module.exports = {createProject, updateProject,getDirName,getProject,updateProjectById }

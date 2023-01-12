@@ -36,7 +36,7 @@ const getUser = async (email) => {
 const getUserAndUpdateTokenForResetPass = async (email) => {
  const user =  await getUser(email);
   const token = bcrypt.hashSync(Date.now.toString(), saltRounds);
-  await userDL.updateProj(user._id, {
+  return await userDL.updateAndReturn(user._id, {
     resetPass: token,
   });
 };

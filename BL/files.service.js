@@ -22,13 +22,13 @@ const uploadRewFiles = async (data) => {
       if (!fs.existsSync(`./${baseDir}/original/${i}.png`)) throw { code: 999, message: `can't create file` }
     }
     else {
-      fs.unlinkSync(`./upload/${data.email}/${v.filename}`)
+      fs.unlinkSync(`./upload/${v.filename}`)
     }
   })
 
   const project = await createProject(user._id,{root: `./${baseDir}`,createDate: date,})
   if (!project) throw errMessage.PROJECT_NOT_FOUND
-  return projProps
+  return project
 }
 
 const saveRunIspObj = async (data) => {
@@ -68,4 +68,4 @@ const getAllFilesInFolder = async (requestedFolder) => {
   })
   return files
 }
-module.exports = { uploadRewFiles, saveRunIspObj, sendToRemoteServer, getAllFilesInFolder }
+module.exports = { uploadRewFiles, saveRunIspObj,getAllFilesInFolder }
