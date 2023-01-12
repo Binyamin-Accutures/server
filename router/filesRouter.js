@@ -8,7 +8,7 @@ const projectService = require('../BL/project.service');
 const { sendError, errMessage } = require('../errController');
 const util = require('util')
 const unlinkFile = util.promisify(fs.unlink)
-const { uploadFiles, getFileStream, showInFolder, uploadSavegFiles } = require('../s3')
+const { uploadFiles, getFileStream, showInFolder, uploadSavegFiles, downloadsfile } = require('../s3')
 const {uploadRewFiles ,getAllFilesInFolder, saveRunIspObj} = require("../BL/files.service");
 const { openProject, setImagesToAccutur } = require('../BL/calibration.service');
 
@@ -47,16 +47,14 @@ const urlImags = ["https://cdn.pixabay.com/photo/2023/01/05/22/36/ai-generated-7
  *               type: string
  *               format: binary
  */
-filesRouter.get('/images/project/:key', (req, res) => {
+
+filesRouter.get('/images/project/:key', async (req, res) => {
     try{
         const key = req.params.key
-        const readStream = getFileStream(key).on('error', (err) => {
-            console.log(err);
-            res.send(err)}) 
-        readStream.pipe(res)
+        await downloadsfile(res,key,getFileStream)
     }
     catch(err){
-        res.statusCode(err.statusCode)
+        sendError( res,err)
     }
 })
 
@@ -217,10 +215,7 @@ filesRouter.put('/images/runisp', async (req,res)=>{
  *             schema: 
  *               type: string 
  */
-
 filesRouter.put("/images/saveImages",upload.any(), async (req, res) => {
-    //update the db
-    //set to the claod
     try{
         const project = await projectService.updateProject(req.body.root,{saveSettings:req.body.saveSettings})
         res.send(project)
