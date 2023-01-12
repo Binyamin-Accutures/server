@@ -21,7 +21,7 @@ const createUser = async (data) => {
   checkData(data, ["email", "firstPassword", "secondPassword"]);
   if (data.firstPassword !== data.secondPassword)
     throw errMessage.PASSWORDS_ARE_NOT_EQUAL;
-  let user = await getUser(data.email);
+  let user = await userDL.findUser({email:data.email});
   if (user) throw errMessage.USER_ALREADY_REGISTERED;
   data.firstPassword = bcrypt.hashSync(data.firstPassword, saltRounds);
   user = await userDL.create(data);
@@ -38,11 +38,11 @@ const getUser = async (email) => {
 const getUserAndUpdateTokenAndSendEmailForResetPass = async (email) => {
   let user = await getUser(email);
   const token = bcrypt.hashSync(String(Date.now()), saltRounds);
-  const done = await userDL.update(user._id, {
+  const done = await userDL.update(email, {
     resetPass: token,
   });
   if (!done) throw "create token for change pass failed";
-  const url = `${process.env.BASE_URL}/renew/${user.email}/verify/${token}`;
+  const url = `${process.env.BASE_URL}/renew/?token=${token}`;
   const msg = {
     email: email,
     text: "Verify Email",
@@ -53,9 +53,8 @@ const getUserAndUpdateTokenAndSendEmailForResetPass = async (email) => {
   return "email send to verify";
 };
 
-const checkRestePassToken = async (email, token) => {
-  const user = await userDL.findUser({ email: email, resetPass: token });
-  console.log(user);
+const checkRestePassToken = async (token) => {
+  const user = await userDL.findUser({ resetPass: token });
   if (!user) throw errMessage.USER_NOT_FOUND;
   userDL.update(user.email, {
     resetPass: "",

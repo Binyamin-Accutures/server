@@ -76,9 +76,6 @@ const sendToRemoteServer = async (root)=>{
 return processedFiles 
 }
 
-
-
-
 const getAllFilesInFolder = async(requestedFolder)=>{
 
   if(!fs.existsSync(`./${requestedFolder}`)) throw {code: 404, message: "path not found"}

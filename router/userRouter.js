@@ -141,14 +141,13 @@ userRouter.post("/changepassword", async (req, res) => {
   }
 });
 
-userRouter.get("/:email/renew/:token", async (req, res) => {
+userRouter.get("/checktoken", async (req, res) => {
   try {
-    const tokenForReseExist = await userService.checkRestePassToken(
-      req.params.email,
-      req.params.token
+    const user = await userService.checkRestePassToken(
+      req.query.token
     );
-    res.status(200).send(tokenForReseExist);
-  } catch (error) {
+    res.status(200).send(user);
+  } catch (err) {
     sendError(res, err);
   }
 });
