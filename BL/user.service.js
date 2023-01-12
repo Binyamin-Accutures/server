@@ -1,9 +1,10 @@
 const userDL = require("../DL/user.controller");
 const auth = require("../auth");
 const bcrypt = require("bcrypt");
-const { checkData } = require("../checkController");
+// const { checkData } = require("../checkController");
 const { errMessage } = require("../errController");
-const projectService = require ("./project.service")
+const projectService = require ("./project.service");
+const { checkData } = require("../checkController");
 const saltRounds = Number(process.env.SALT_ROUNDS) || 10;
 
 const login = async (data) => {

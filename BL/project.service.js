@@ -9,12 +9,12 @@ const getProject = async (root) => {
 } 
 
 const createProject = async (user_id, data) =>{
-    checkData({user_id,...data},["user_id","root","createDate"])
+    checkData({user_id,...data},["root", "root"])
     const newProject = await projDL.create(data)
-    await userDL.updateAndReturn(user_id, {
+    const updateRes = await userDL.updateAndReturn(user_id, {
         $push: { projects: newProject._id },
       });
-    return newProject
+      return updateRes;
 }
 
 const updateProject = async (root,saveSettings) =>{

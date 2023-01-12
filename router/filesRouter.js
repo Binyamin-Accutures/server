@@ -1,5 +1,5 @@
-const express = require('express');
-const filesRouter = express.Router()
+const express = require("express");
+const filesRouter = express.Router();
 const multer = require(`multer`);
 const upload = multer({ dest: "./upload" })
 const fs = require('fs');
@@ -352,7 +352,7 @@ filesRouter.get('/projects', async (req, res) => {
  *             schema:
  *               type: object
  */
-filesRouter.get('/:projectName/:folder', async (req,res)=>{
+filesRouter.get('/:user/:projectName/:folder', async (req,res)=>{
     try{
     const requestedFolder = `upload/${req.email}/${req.params.projectName}/${req.params.folder}`
     

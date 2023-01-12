@@ -46,14 +46,14 @@ const uploadRewFiles = async (data) => {
   fs.mkdirSync(`./${baseDir}/original`)
   files.forEach((v, i) => {
     if (v.mimetype === `image/png`) {
-      fs.renameSync(`./upload/${v.filename}`, `./${baseDir}/original/${i}.png`)
-      if (!fs.existsSync(`./${baseDir}/original/${i}.png`)) throw { code: 999, message: `can't create file` }
+      fs.renameSync(`./upload/${v.filename}`, `./${baseDir}/original/${v.originalname}`)
+      if (!fs.existsSync(`./${baseDir}/original/${v.originalname}`)) throw { code: 999, message: `can't create file` }
     }
     else {
       fs.unlinkSync(`./upload/${v.filename}`)
     }
   })
-  const project = await createProject(user._id, { root: `./${baseDir}`, createDate: date, })
+  const project = await createProject(user._id,{root: `./${baseDir}`,createDate: date,})
   if (!project) throw errMessage.PROJECT_NOT_FOUND
   return project
 }
