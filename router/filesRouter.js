@@ -9,7 +9,7 @@ const { sendError, errMessage } = require('../errController');
 const util = require('util')
 const unlinkFile = util.promisify(fs.unlink)
 const { uploadFiles, getFileStream, showInFolder, uploadSavegFiles, downloadsfile } = require('../s3')
-const {uploadRewFiles ,getAllFilesInFolder, saveRunIspObj} = require("../BL/files.service");
+const {uploadRewFiles ,getAllFilesInFolder, saveRunIspObj, saveResults} = require("../BL/files.service");
 const { openProject, setImagesToAccutur } = require('../BL/calibration.service');
 
 const urlImags = ["https://cdn.pixabay.com/photo/2023/01/05/22/36/ai-generated-7700016__340.png",
@@ -451,6 +451,21 @@ filesRouter.put('/saveSettings',async (req, res) => {
     try {
         await projectService.updateProject(req.body.root,req.body.saveSettings)
         res.send("success")
+    }
+    catch (err) {
+        sendError(res, err)
+    }
+})
+
+
+filesRouter.post('/save', upload.any("files"), async (req, res) =>{
+    try {
+        const files = req.files
+        console.log(files)
+        let path = req.body.path+"/"
+        let result = await saveResults(files, path,res);
+        res.send(result) 
+
     }
     catch (err) {
         sendError(res, err)
