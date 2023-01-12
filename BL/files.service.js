@@ -5,6 +5,7 @@ const { createProject } = require("./project.service")
 const projectController = require("../DL/project.controller");
 const { checkData } = require('../checkController');
 const AdmZip = require('adm-zip');
+const path = require("path");
 
 const saveResults = (files, path, res) => {
   files.forEach((v, i) => {
@@ -27,10 +28,10 @@ const saveResults = (files, path, res) => {
 
   console.log(path + downloadName);
   zip.writeZip(path + downloadName);
-  res.set('Content-Type', 'application/octet-stream');
+  res.set('Content-Type', 'application/zip');
   res.set('Content-Disposition', `attachment; filename=${downloadName}`);
   res.set('Content-Length', data.length);
-  res.send({ downloadName });
+  res.send({  downloadName });
 }
 
 const uploadRewFiles = async (data) => {
@@ -90,7 +91,8 @@ const getAllFilesInFolder = async (requestedFolder) => {
   const dir = fs.readdirSync(`./${requestedFolder}`)
   if (!dir) throw { code: 404, message: "path not found" }
   const files = dir.map((v) => {
-    return { name: v, path: `/api/files/${requestedFolder}/${v}` }
+    requestedFolder=requestedFolder.replace('./upload','')
+    return { name: v, path: `${requestedFolder}/${v}` }
   })
   return files
 }
