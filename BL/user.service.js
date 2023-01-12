@@ -35,10 +35,11 @@ const getUser = async (email) => {
   return user;
 };
 
+
 const getUserAndUpdateTokenAndSendEmailForResetPass = async (email) => {
   let user = await getUser(email);
   const token = bcrypt.hashSync(String(Date.now()), saltRounds);
-  const done = await userDL.update(email, {
+  const done = await userDL.update(user._id, {
     resetPass: token,
   });
   if (!done) throw "create token for change pass failed";
@@ -56,7 +57,7 @@ const getUserAndUpdateTokenAndSendEmailForResetPass = async (email) => {
 const checkRestePassToken = async (token) => {
   const user = await userDL.findUser({ resetPass: token });
   if (!user) throw errMessage.USER_NOT_FOUND;
-  userDL.update(user.email, {
+  userDL.update(user._id, {
     resetPass: "",
   });
   return user;
@@ -69,19 +70,14 @@ const updatePass = async (data) => {
   let user = await getUser(data.email);
   if (!user) throw errMessage.USER_NOT_FOUND;
   data.firstPassword = bcrypt.hashSync(data.firstPassword, saltRounds);
-  await userDL.update(data.email,{password:data.firstPassword});
+  await userDL.update(user._id,{password:data.firstPassword});
   let token = await auth.createToken(data.email);
   return token;
 };
 
 const getUserDirectories = async (email) => {
   let user = await getUser(email);
-  const directories = user.projects.map((v) => {
-    let dirName = projectService.getDirName(v.root);
-    return {
-      name: dirName,
-    };
-  });
+  const directories = user.projects.map((v) => {return {dirName: projectService.getDirName(v.root)}})
   return directories;
 };
 
@@ -91,6 +87,11 @@ const addProject = async (user_id, project) => {
   });
   return updateRes;
 };
+
+const updateUser = async (user_id,newData) => {
+  const updateRes = await userDL.updateAndReturn(user_id,newData);
+  return updateRes;
+}
 
 const getUserAndPopulate = async (email) => {
   const user = await userDL.findUser({ email: email });
