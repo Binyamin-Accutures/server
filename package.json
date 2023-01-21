@@ -1,11 +1,13 @@
 {
   "dependencies": {
+    "adm-zip": "^0.5.10",
     "aws-sdk": "^2.1292.0",
     "axios": "^1.2.2",
     "bcrypt": "^5.1.0",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
+    "fs": "^0.0.1-security",
     "FormData": "^0.10.1",
     "formdata-node": "^5.0.0",
     "jsonwebtoken": "^9.0.0",
