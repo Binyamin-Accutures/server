@@ -27,7 +27,7 @@ const uploadRewFiles = async (data) => {
  const src = fs.readdirSync(`./${baseDir}/original`).map((v)=>{
     return `/api/files/${baseDir}/original/${v}`
 })
-const project = await createProject(user._id, {root:`./${baseDir}`,createDate:date})
+const project = createProject(user._id, {root:`./${baseDir}`,createDate:date})
 if (!project) throw errMessage.PROJECT_NOT_FOUND ////error
 return project
 })

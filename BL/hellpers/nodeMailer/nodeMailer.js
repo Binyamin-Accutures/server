@@ -1,6 +1,8 @@
 const nodeMailer = require("nodemailer");
+const hbs = require("nodemailer-express-handlebars");
+const path = require("path");
 
-module.exports = async ({email,text,subject,html}) => {
+module.exports = async (emailOptions) => {
   try {
     const transport = nodeMailer.createTransport({
       host: process.env.HOST,
@@ -13,14 +15,14 @@ module.exports = async ({email,text,subject,html}) => {
       },
     });
 
-    await transport.sendMail({
-        from: process.env.EMAIL_USER,
-        to: email,
-        subject: subject,
-        text: text,
-        html: html,
+    transport.sendMail(emailOptions, (error, info) => {
+      if (error) {
+        console.log(error);
+      } else {
+        console.log("email sent: " + info.response);
+        console.log("Email sent successfully");
+      }
     });
-    console.log("Email sent successfully");
   } catch (error) {
     console.log("Email not sent");
     console.log(error);

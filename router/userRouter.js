@@ -157,10 +157,7 @@ userRouter.get("/", auth.validToken, async (req, res) => {
 
 userRouter.get("/forgot", async (req, res) => {
   try {
-    const userExist =
-      await userService.getUserAndUpdateTokenAndSendEmailForResetPass(
-        req.query.email
-      );
+    const userExist = await userService.getUserForResetPass(req.query.email);
     res.send(userExist);
   } catch (err) {
     sendError(res, err);
