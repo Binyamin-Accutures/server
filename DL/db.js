@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 const MONGO_URL = process.env.MONGO_URL;
 
+mongoose.set('strictQuery', false);
+
 async function connect() {
   try {
     mongoose.connect(
