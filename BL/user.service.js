@@ -14,6 +14,9 @@ const {
 const login = async (data) => {
   checkData(data, ["email", "password"]);
   let user = await userDL.findUserWithPass({ email: data.email });
+  if (!user) throw errMessage.USER_NOT_FOUND;
+  const isActive = await userDL.findUser({ email: data.email, isActive: true });
+  if (!isActive) throw errMessage.USER_NOT_AQCTIVE;
   const bcrypted = bcrypt.compareSync(data.password, user.password);
   if (!bcrypted) throw errMessage.WORNG_PASSWORD;
   let token = await auth.createToken(data.email);
@@ -26,6 +29,8 @@ const createUser = async (data) => {
     throw errMessage.PASSWORDS_ARE_NOT_EQUAL;
   let user = await userDL.findUser({ email: data.email });
   if (user) throw errMessage.USER_ALREADY_REGISTERED;
+  if (user && user.isActive === false)
+    userDL.update({ email: data.email, isActive: true });
   data.firstPassword = bcrypt.hashSync(data.firstPassword, saltRounds);
   user = await userDL.create(data);
   let token = await auth.createToken(data.email);
@@ -47,6 +52,8 @@ const updatePass = async (data) => {
 const getUser = async (email) => {
   const user = await userDL.findUser({ email: email });
   if (!user) throw errMessage.USER_NOT_FOUND;
+  const isActive = await userDL.findUser({ email: email, isActive: true });
+  if (!isActive) throw errMessage.USER_NOT_FOUND;
   return user;
 };
 
@@ -70,7 +77,7 @@ const getUserForResetPass = async (email) => {
   };
 
   await sendEmail(emailOptions);
-  return "email send to verify";
+  return "email send to reset password";
 };
 
 const checkRestePassToken = async (token) => {
