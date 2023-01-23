@@ -5,7 +5,7 @@ const { createProject } = require("./project.service")
 const projectController = require("../DL/project.controller");
 const { checkData } = require('../checkController');
 const AdmZip = require('adm-zip');
-const path = require("path");
+// const path = require("path");
 
 const saveResults = (files, path, res) => {
   files.forEach((v, i) => {
