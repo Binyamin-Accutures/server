@@ -5,22 +5,17 @@ const { createProject } = require("./project.service")
 const projectController = require("../DL/project.controller");
 const { checkData } = require('../checkController');
 const AdmZip = require('adm-zip');
-const path = require("path");
 
-const saveResults = (files, path, res) => {
-  files.forEach((v, i) => {
-    if (v.mimetype === `image/png`) {
-      let name = v.originalname;
-      if (!fs.existsSync(`${path}`)) fs.mkdirSync(`${path}`)
-      if (!fs.existsSync(`${path}${v.fieldname}`)) fs.mkdirSync(`${path}${v.fieldname}`)
-      fs.renameSync(`./upload/${v.filename}`, `${path}${v.fieldname}/${name}`)
-      if (!fs.existsSync(`${path}${v.fieldname}/${name}`)) throw { code: 500, message: `can't create file` }
-    }
+const saveResults = async (files, path, res) => {
+  if (!fs.existsSync(`${path}`)) fs.mkdirSync(`${path}`)
+  await files.forEach(async file => {
+    if (!fs.existsSync(`${path}/${file.fieldname}`)) fs.mkdirSync(`${path}/${file.fieldname}`)
+    await orderedFiles(`${path}/${file.fieldname}`,v)
   })
   //saving AS ZIP
   const zip = new AdmZip();
-  zip.addLocalFolder(path)
   const downloadName = `processed_${path.split('/')[2]}.zip`;
+  zip.addLocalFolder(path,downloadName)
   console.log(downloadName);
   const data = zip.toBuffer();
 
@@ -39,26 +34,24 @@ const uploadRewFiles = async (data) => {
   const user = await userService.getUser(data.email)
   const date = Date.now()
   const files = data.files
-  if (!fs.existsSync(`./upload/${data.email}`)) {
-    fs.mkdirSync(`./upload/${data.email}`)
-  }
+  if (!fs.existsSync(`./upload/${data.email}`)) fs.mkdirSync(`./upload/${data.email}`)
   const baseDir = `upload/${data.email}/${date}`
   fs.mkdirSync(`./${baseDir}`)
   fs.mkdirSync(`./${baseDir}/original`)
-  files.forEach((v, i) => {
-    if (v.mimetype === `image/png`) {
-      fs.renameSync(`./upload/${v.filename}`, `./${baseDir}/original/${i}.png`)
-      if (!fs.existsSync(`./${baseDir}/original/${i}.png`)) throw { code: 999, message: `can't create file` }
-    }
-    else {
-      fs.unlinkSync(`./upload/${v.filename}`)
-    }
-  })
+  await files.forEach(async file => await orderedFiles(`./${baseDir}/original`,file))
   const project = await createProject(user._id, { root: `./${baseDir}`, createDate: date, })
   if (!project) throw errMessage.PROJECT_NOT_FOUND
   return project
 }
-
+const orderedFiles = async(path,file)=>{
+    if (file.mimetype === `image/png`) {
+      fs.renameSync(`./upload/${file.filename}`, `./${path}/${file.originalname}.png`)
+      if (!fs.existsSync(`./${path}/${file.originalname}.png`)) throw errMessage.CAN_NOT_CHANGE_FILE_NAME
+    }
+    else {
+      fs.unlinkSync(`./upload/${v.filename}`)
+    }
+}
 const saveRunIspObj = async (data) => {
   checkData(data, ["root", "runIspSettings"])
   return await projectController.updateAndReturnByAnyFilter({ root: data.root }, { runIspSettings: data.runIspSettings })

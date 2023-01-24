@@ -70,9 +70,7 @@ const getUserForResetPass = async (email) => {
   const done = await userDL.update(user._id, {
     resetPass: token,
   });
-
-  if (!done) throw "create token for change pass failed";
-
+  if (!done) throw errMessage.TOKEN_DID_NOT_CREATED
   const url = `${process.env.BASE_URL}/renew/?token=${token}`;
 
   const emailOptions = {
@@ -86,6 +84,7 @@ const getUserForResetPass = async (email) => {
   await sendEmail(emailOptions);
   return "email send to reset password";
 };
+
 
 const checkRestePassToken = async (token) => {
   const user = await userDL.findUser({ resetPass: token });

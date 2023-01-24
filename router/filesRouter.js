@@ -463,13 +463,7 @@ filesRouter.put('/saveSettings', async (req, res) => {
 
 filesRouter.post('/save', upload.any("files"), async (req, res) => {
     try {
-        const files = req.files
-        console.log(files)
-        res.send(files[0])
-        let path = req.body.path + "/"
-        let result = await saveResults(files, path, res);
-        res.send(result)
-
+        saveResults(req.files, req.body.path, res);
     }
     catch (err) {
         sendError(res, err)
