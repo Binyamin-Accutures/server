@@ -28,11 +28,18 @@ const createUser = async (data) => {
   if (data.firstPassword !== data.secondPassword)
     throw errMessage.PASSWORDS_ARE_NOT_EQUAL;
   let user = await userDL.findUser({ email: data.email });
-  if (user) throw errMessage.USER_ALREADY_REGISTERED;
-  if (user && user.isActive === false)
-    userDL.update({ email: data.email, isActive: true });
-  data.firstPassword = bcrypt.hashSync(data.firstPassword, saltRounds);
-  user = await userDL.create(data);
+
+  if (user) {
+    if (user && user.isActive === false) {
+      data.firstPassword = bcrypt.hashSync(data.firstPassword, saltRounds);
+      userDL.update(user._id, { isActive: true, password: data.firstPassword });
+    } else {
+      throw errMessage.USER_ALREADY_REGISTERED;
+    }
+  } else {
+    data.firstPassword = bcrypt.hashSync(data.firstPassword, saltRounds);
+    user = await userDL.create(data);
+  }
   let token = await auth.createToken(data.email);
   return token;
 };
