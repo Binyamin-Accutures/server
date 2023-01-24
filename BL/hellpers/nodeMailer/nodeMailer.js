@@ -1,5 +1,4 @@
 const nodeMailer = require("nodemailer");
-const hbs = require("nodemailer-express-handlebars");
 const path = require("path");
 
 module.exports = async (emailOptions) => {

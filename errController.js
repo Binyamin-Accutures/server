@@ -5,6 +5,7 @@ const err = (c, m) => {
 const errMessage = Object.freeze({
   MISSING_DATA: err(400, "missing data"),
   USER_NOT_FOUND: err(400, "user not found"),
+  USER_NOT_AQCTIVE: err(400, "user not active"),
   USER_ALREADY_REGISTERED: err(400, "user already registered"),
   USER_NOT_REGISTERED: err(400, "user not registered"),
   SUCCESS: err(200, "success"),
@@ -20,7 +21,7 @@ const errMessage = Object.freeze({
 
 const sendError = (res, err) => {
   console.log(err);
-  res.status(err.code||500).send(err.message||"try agien later");
+  res.status(err.code || 500).send(err.message || "try agien later");
 };
 module.exports = {
   errMessage,
