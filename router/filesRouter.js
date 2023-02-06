@@ -9,7 +9,7 @@ const { sendError, errMessage } = require('../errController');
 const util = require('util')
 const unlinkFile = util.promisify(fs.unlink)
 const { uploadFiles, getFileStream, showInFolder, uploadSavegFiles, downloadsfile } = require('../s3')
-const { uploadRewFiles, getAllFilesInFolder, saveRunIspObj, saveResults } = require("../BL/files.service");
+const { uploadRewFiles, getAllFilesInFolder, saveRunIspObj, saveResults, sendToRemoteServer } = require("../BL/files.service");
 const { openProject, setImagesToAccutur } = require('../BL/calibration.service');
 
 const urlImags = ["https://cdn.pixabay.com/photo/2023/01/05/22/36/ai-generated-7700016__340.png",
@@ -403,9 +403,8 @@ filesRouter.get('/:projectName/:folder', async (req, res) => {
 filesRouter.put('/runisp', async (req, res) => {
     try {
         const src = await saveRunIspObj({ root: req.body.root, runIspSettings: req.body.runIspSettings })
-        //requset from accutur
-        //update the urlAfterRunIsp in project's DB
-        const requestedFolder = `${req.body.root}/original`
+        await sendToRemoteServer(req.body.root)
+        const requestedFolder = `${req.body.root}/accutur`
         let host = req.protocol + '://' + req.get('host');
         const files = await getAllFilesInFolder(requestedFolder)
         res.send({ src: files.map(f => host + f.path) })

@@ -5,6 +5,7 @@ const { createProject } = require("./project.service")
 const projectController = require("../DL/project.controller");
 const { checkData } = require('../checkController');
 const AdmZip = require('adm-zip');
+const {fork} = require('child_process');
 
 const saveResults = async (files, path, res) => {
   if (!fs.existsSync(`${path}`)) fs.mkdirSync(`${path}`)
@@ -49,7 +50,7 @@ const orderedFiles = async(path,file)=>{
       if (!fs.existsSync(`./${path}/${file.originalname}.png`)) throw errMessage.CAN_NOT_CHANGE_FILE_NAME
     }
     else {
-      fs.unlinkSync(`./upload/${v.filename}`)
+      fs.unlinkSync(`./upload/${file.filename}`)
     }
 }
 const saveRunIspObj = async (data) => {
@@ -57,27 +58,17 @@ const saveRunIspObj = async (data) => {
   return await projectController.updateAndReturnByAnyFilter({ root: data.root }, { runIspSettings: data.runIspSettings })
 }
 
-// const sendToRemoteServer = async (root) => {
-//   try {
-
-//     const project = await projectsCtrl.readOne({ root: root });
-//     const runIsp = project.runIspSettings
-//     theRoot = `${project.root.slice(2)}/original`
-//     const originalFiles = await getAllFilesInFolder(theRoot)
-
-//     const res = await axios.post(serverUrl, originalFiles)
-//     const processedFiles = res.data
-//     if (processedFiles) {
-//       saveToProj = await projectsCtrl.updateAndReturn(project._id, { urlafterRunIsp: processedFiles })
-//       if (saveToProj) return { processedFiles, root: project.root }
-//     }
-//     else throw error("no files")
-//   } catch (err) {
-
-
-//   }
-//   return processedFiles
-// }
+const sendToRemoteServer = async (root) => {
+  const project = await projectController.readOne({ root: root });
+  const inputRoot = `${project.root}/original`
+  const outputRoot = `${project.root}/output`
+  fs.mkdirSync(outputRoot)
+  const myJson = JSON.stringify({inputs:inputRoot,outputs:outputRoot,image_processing:project.runIspSettings})
+  const jsonRoot = "./acctur_json.json"
+  fs.writeFileSync(jsonRoot, myJson);
+  const child =fork("SimpleISP.py",[jsonRoot])
+  return 
+}
 
 const getAllFilesInFolder = async (requestedFolder) => {
   if (!fs.existsSync(`./${requestedFolder}`)) throw { code: 404, message: "path not found" }
@@ -89,4 +80,4 @@ const getAllFilesInFolder = async (requestedFolder) => {
   })
   return files
 }
-module.exports = { uploadRewFiles, saveRunIspObj, getAllFilesInFolder, saveResults }
+module.exports = { uploadRewFiles,sendToRemoteServer, saveRunIspObj, getAllFilesInFolder, saveResults }
