@@ -34,6 +34,7 @@ def SimpleISP(Params: dict):
             sio.imsave(dest,DoLP_Colorized)
             dest = os.path.join(OutputFolder,file_name[:-4] + '_AoLP.png')
             sio.imsave(dest,AoLP_Colorized)
+    print("done")
 
 def DynamicRangeStretch(Im,Params=None):
     Min = Im.min()

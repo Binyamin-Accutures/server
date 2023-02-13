@@ -405,9 +405,10 @@ filesRouter.put('/runisp', async (req, res) => {
         const src = await saveRunIspObj({ root: req.body.root, runIspSettings: req.body.runIspSettings })
         await sendToRemoteServer(req.body.root)
         const requestedFolder = `${req.body.root}/accutur`
-        let host = req.protocol + '://' + req.get('host');
-        const files = await getAllFilesInFolder(requestedFolder)
-        res.send({ src: files.map(f => host + f.path) })
+        // let host = req.protocol + '://' + req.get('host');
+        // const files = await getAllFilesInFolder(requestedFolder)
+        // res.send({ src: files.map(f => host + f.path) })
+        res.send("sababa")
     }
     catch (err) {
         sendError(res, err)

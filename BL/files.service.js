@@ -1,22 +1,23 @@
-const fs = require('fs');
-const userService = require('../BL/user.service');
-const { errMessage } = require('../errController');
-const { createProject } = require("./project.service")
+const fs = require("fs");
+const userService = require("../BL/user.service");
+const { errMessage } = require("../errController");
+const { createProject } = require("./project.service");
 const projectController = require("../DL/project.controller");
-const { checkData } = require('../checkController');
-const AdmZip = require('adm-zip');
-const {fork} = require('child_process');
+const { checkData } = require("../checkController");
+const AdmZip = require("adm-zip");
+const { spawn } = require("child_process");
 
 const saveResults = async (files, path, res) => {
-  if (!fs.existsSync(`${path}`)) fs.mkdirSync(`${path}`)
-  await files.forEach(async file => {
-    if (!fs.existsSync(`${path}/${file.fieldname}`)) fs.mkdirSync(`${path}/${file.fieldname}`)
-    await orderedFiles(`${path}/${file.fieldname}`,v)
-  })
+  if (!fs.existsSync(`${path}`)) fs.mkdirSync(`${path}`);
+  await files.forEach(async (file) => {
+    if (!fs.existsSync(`${path}/${file.fieldname}`))
+      fs.mkdirSync(`${path}/${file.fieldname}`);
+    await orderedFiles(`${path}/${file.fieldname}`, v);
+  });
   //saving AS ZIP
   const zip = new AdmZip();
-  const downloadName = `processed_${path.split('/')[2]}.zip`;
-  zip.addLocalFolder(path,downloadName)
+  const downloadName = `processed_${path.split("/")[2]}.zip`;
+  zip.addLocalFolder(path, downloadName);
   console.log(downloadName);
   const data = zip.toBuffer();
 
@@ -24,60 +25,114 @@ const saveResults = async (files, path, res) => {
 
   console.log(path + downloadName);
   zip.writeZip(path + downloadName);
-  res.set('Content-Type', 'application/zip');
-  res.set('Content-Disposition', `attachment; filename=${downloadName}`);
-  res.set('Content-Length', data.length);
-  res.send({  downloadName });
-}
+  res.set("Content-Type", "application/zip");
+  res.set("Content-Disposition", `attachment; filename=${downloadName}`);
+  res.set("Content-Length", data.length);
+  res.send({ downloadName });
+};
 
 const uploadRewFiles = async (data) => {
-  checkData(data, ["email", "files"])
-  const user = await userService.getUser(data.email)
-  const date = Date.now()
-  const files = data.files
-  if (!fs.existsSync(`./upload/${data.email}`)) fs.mkdirSync(`./upload/${data.email}`)
-  const baseDir = `upload/${data.email}/${date}`
-  fs.mkdirSync(`./${baseDir}`)
-  fs.mkdirSync(`./${baseDir}/original`)
-  await files.forEach(async file => await orderedFiles(`./${baseDir}/original`,file))
-  const project = await createProject(user._id, { root: `./${baseDir}`, createDate: date, })
-  if (!project) throw errMessage.PROJECT_NOT_FOUND
-  return project
-}
-const orderedFiles = async(path,file)=>{
-    if (file.mimetype === `image/png`) {
-      fs.renameSync(`./upload/${file.filename}`, `./${path}/${file.originalname}.png`)
-      if (!fs.existsSync(`./${path}/${file.originalname}.png`)) throw errMessage.CAN_NOT_CHANGE_FILE_NAME
-    }
-    else {
-      fs.unlinkSync(`./upload/${file.filename}`)
-    }
-}
+  checkData(data, ["email", "files"]);
+  const user = await userService.getUser(data.email);
+  const date = Date.now();
+  const files = data.files;
+  if (!fs.existsSync(`./upload/${data.email}`))
+    fs.mkdirSync(`./upload/${data.email}`);
+  const baseDir = `upload/${data.email}/${date}`;
+  fs.mkdirSync(`./${baseDir}`);
+  fs.mkdirSync(`./${baseDir}/original`);
+  await files.forEach(
+    async (file) => await orderedFiles(`./${baseDir}/original`, file)
+  );
+  const project = await createProject(user._id, {
+    root: `./${baseDir}`,
+    createDate: date,
+  });
+  if (!project) throw errMessage.PROJECT_NOT_FOUND;
+  return project;
+};
+const orderedFiles = async (path, file) => {
+  if (file.mimetype === `image/png`) {
+    fs.renameSync(
+      `./upload/${file.filename}`,
+      `./${path}/${file.originalname}.png`
+    );
+    if (!fs.existsSync(`./${path}/${file.originalname}.png`))
+      throw errMessage.CAN_NOT_CHANGE_FILE_NAME;
+  } else {
+    fs.unlinkSync(`./upload/${file.filename}`);
+  }
+};
 const saveRunIspObj = async (data) => {
-  checkData(data, ["root", "runIspSettings"])
-  return await projectController.updateAndReturnByAnyFilter({ root: data.root }, { runIspSettings: data.runIspSettings })
-}
+  checkData(data, ["root", "runIspSettings"]);
+  return await projectController.updateAndReturnByAnyFilter(
+    { root: data.root },
+    { runIspSettings: data.runIspSettings }
+  );
+};
 
 const sendToRemoteServer = async (root) => {
   const project = await projectController.readOne({ root: root });
-  const inputRoot = `${project.root}/original`
-  const outputRoot = `${project.root}/output`
-  fs.mkdirSync(outputRoot)
-  const myJson = JSON.stringify({inputs:inputRoot,outputs:outputRoot,image_processing:project.runIspSettings})
-  const jsonRoot = "./acctur_json.json"
+  const inputRoot = `${project.root}/original`;
+  const outputRoot = `${project.root}/output`;
+  fs.mkdirSync(outputRoot);
+  const myJson = JSON.stringify({
+    inputs: {input_folder:inputRoot,start_frame:0,end_frame:2},
+    "outputs": 
+    {
+        "hsv_rep": 
+        {
+            "hue_scale_factor": 1.5
+        },
+        "video": 
+        {
+            "video_frame_rate": 8
+        }, 
+        "save_outputs": 
+        {
+            "save_images": true, 
+            "save_videos": true, 
+            "dump_folder": outputRoot
+        }
+    },
+    image_processing: project.runIspSettings,
+  });
+  const jsonRoot = "./acctur_json.json";
   fs.writeFileSync(jsonRoot, myJson);
-  const child =fork("SimpleISP.py",[jsonRoot])
-  return 
-}
+  const child = spawn("python", [`SimpleISP.py`]);
+  let result = "";
+
+  child.stdout.on("data", (data) => {
+    console.log(data.toString());
+    result += data.toString();
+  });
+  
+  child.stderr.on("data", (data) => {
+    console.error(data.toString());
+  });
+
+  child.on("exit", (code) => {
+    console.log(`Child process exited with code ${code}`);
+    console.log(`Result: ${result}`);
+    return;
+  });
+};
 
 const getAllFilesInFolder = async (requestedFolder) => {
-  if (!fs.existsSync(`./${requestedFolder}`)) throw { code: 404, message: "path not found" }
-  const dir = fs.readdirSync(`./${requestedFolder}`)
-  if (!dir) throw { code: 404, message: "path not found" }
+  if (!fs.existsSync(`./${requestedFolder}`))
+    throw { code: 404, message: "path not found" };
+  const dir = fs.readdirSync(`./${requestedFolder}`);
+  if (!dir) throw { code: 404, message: "path not found" };
   const files = dir.map((v) => {
-    requestedFolder=requestedFolder.replace('./upload','')
-    return { name: v, path: `${requestedFolder}/${v}` }
-  })
-  return files
-}
-module.exports = { uploadRewFiles,sendToRemoteServer, saveRunIspObj, getAllFilesInFolder, saveResults }
+    requestedFolder = requestedFolder.replace("./upload", "");
+    return { name: v, path: `${requestedFolder}/${v}` };
+  });
+  return files;
+};
+module.exports = {
+  uploadRewFiles,
+  sendToRemoteServer,
+  saveRunIspObj,
+  getAllFilesInFolder,
+  saveResults,
+};
