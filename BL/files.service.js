@@ -97,12 +97,13 @@ const sendToRemoteServer = async (root,res,host) => {
     },
     image_processing: project.runIspSettings,
   });
-  const jsonRoot = "./acctur_json.json";
+  const jsonRoot = `./acctur_json_${Date.now()}.json`;
   fs.writeFileSync(jsonRoot, myJson);
-  const child = spawn("python", [`SimpleISP.py`]);
+  const child = spawn("python", [`SimpleISP.py`,jsonRoot]);
   let result = "";
 
   child.stdout.on("data", (data) => {
+    console.log(data.toString());
     result += data.toString();
   });
   
@@ -113,7 +114,7 @@ const sendToRemoteServer = async (root,res,host) => {
   child.on("exit", async (code) => {
     const files = await getAllFilesInFolder(outputRoot)
     res.send({ src: files.map(f => host + f.path) })
-    fs.unlink(jsonRoot)
+    fs.unlinkSync(jsonRoot)
   });
 };
 

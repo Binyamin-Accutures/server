@@ -4,6 +4,7 @@ import numpy as np
 import cv2 as cv
 from skimage import io as sio
 import matplotlib.pyplot as plt
+import sys
 
 def SimpleISP(Params: dict):
     InputImagesPaths = GetImagePaths(Params['inputs'])
@@ -34,7 +35,6 @@ def SimpleISP(Params: dict):
             sio.imsave(dest,DoLP_Colorized)
             dest = os.path.join(OutputFolder,file_name[:-4] + '_AoLP.png')
             sio.imsave(dest,AoLP_Colorized)
-    print("done")
 
 def DynamicRangeStretch(Im,Params=None):
     Min = Im.min()
@@ -153,6 +153,6 @@ def CreateAoLPColorImage(AoLP,DoLP,S0,AoLPOnly,OptParams=None):
     return AoLP_Im
 
 if __name__ == "__main__":
-    cfg = open('acctur_json.json')
+    cfg = open(''+sys.argv[1])
     Settings = json.load(cfg)
     SimpleISP(Settings)
