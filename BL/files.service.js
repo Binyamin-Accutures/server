@@ -55,9 +55,9 @@ const orderedFiles = async (path, file) => {
   if (file.mimetype === `image/png`) {
     fs.renameSync(
       `./upload/${file.filename}`,
-      `./${path}/${file.originalname}.png`
+      `./${path}/${file.originalname}`
     );
-    if (!fs.existsSync(`./${path}/${file.originalname}.png`))
+    if (!fs.existsSync(`./${path}/${file.originalname}`))
       throw errMessage.CAN_NOT_CHANGE_FILE_NAME;
   } else {
     fs.unlinkSync(`./upload/${file.filename}`);
@@ -71,7 +71,7 @@ const saveRunIspObj = async (data) => {
   );
 };
 
-const sendToRemoteServer = async (root) => {
+const sendToRemoteServer = async (root,res,host) => {
   const project = await projectController.readOne({ root: root });
   const inputRoot = `${project.root}/original`;
   const outputRoot = `${project.root}/output`;
@@ -103,18 +103,17 @@ const sendToRemoteServer = async (root) => {
   let result = "";
 
   child.stdout.on("data", (data) => {
-    console.log(data.toString());
     result += data.toString();
   });
   
   child.stderr.on("data", (data) => {
-    console.error(data.toString());
+  throw errMessage.IMG_CAN_NOT_BE_PROCESSED
   });
 
-  child.on("exit", (code) => {
-    console.log(`Child process exited with code ${code}`);
-    console.log(`Result: ${result}`);
-    return;
+  child.on("exit", async (code) => {
+    const files = await getAllFilesInFolder(outputRoot)
+    res.send({ src: files.map(f => host + f.path) })
+    fs.unlink(jsonRoot)
   });
 };
 

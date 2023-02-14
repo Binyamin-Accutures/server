@@ -153,6 +153,6 @@ def CreateAoLPColorImage(AoLP,DoLP,S0,AoLPOnly,OptParams=None):
     return AoLP_Im
 
 if __name__ == "__main__":
-    cfg = open('SimpleISP_input.json')
+    cfg = open('acctur_json.json')
     Settings = json.load(cfg)
     SimpleISP(Settings)

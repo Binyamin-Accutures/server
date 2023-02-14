@@ -17,6 +17,7 @@ const errMessage = Object.freeze({
   CAN_NOT_GET_URL: err(999, "can't get url"),
   CAN_NOT_CREATE_FOLDER: err(999, "can't create folder"),
   CAN_NOT_CHANGE_FILE_NAME:err(999, "can't chenge file name"),
+  IMG_CAN_NOT_BE_PROCESSED:err(999, "can't process image"),
 });
 
 const sendError = (res, err) => {
