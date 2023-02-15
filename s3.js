@@ -14,23 +14,19 @@ const s3 = new S3({
   secretAccessKey
 })
 
-// uploads a files to s3
 const uploadFiles = async (files, path)=> { // array of files to upload and path to location of the files in S3
   
     const params = files.map(file => {
-        console.log(file);
         return {
             Bucket: bucketName,
-            Key: `${path}/${file.filename}`,
+            Key: `${path}/${file.filename}.png`,
             Body: fs.createReadStream(file.path)
         }
     })
     return await Promise.all(params.map(param => s3.upload(param).promise()))
 }
-exports.uploadFiles=uploadFiles
 
 async function showInFolder(path){
-    console.log(path);
     const params = {
         Bucket:bucketName,
         Prefix:path,
@@ -41,23 +37,19 @@ async function showInFolder(path){
     }).promise();
     return results
 }
-exports.showInFolder=showInFolder
-// downloads a file from s3
+
+
 function getFileStream(path) {
     const downloadParams = {
         Bucket: bucketName,
         Key: path
     };
-    
-
-  return s3.getObject(downloadParams).createReadStream()
+    return s3.getObject(downloadParams).createReadStream()
 }
-exports.getFileStream=getFileStream
 
 
 async function uploadSavegFiles(files,path){
     const params = files.map(file => {
-        console.log(file);
         return {
             Bucket: bucketName,
             Key: `${path}/${file.filedname}/${file.filename}`,
@@ -66,4 +58,18 @@ async function uploadSavegFiles(files,path){
     })
     return await Promise.all(params.map(param => s3.upload(param).promise()))
 }
-exports.uploadSavegFiles=uploadSavegFiles
+
+const downloadsfile = async (res,key,func)=>{
+    
+    const readStream = func(key)
+    
+    readStream.on('data', (data) => {
+      res.send(data);
+    });
+    
+    readStream.on('error', (err) => {
+      sendError(res,errMessage.CAN_NOT_GET_URL)
+    });
+}
+
+module.exports ={downloadsfile,uploadSavegFiles,getFileStream,showInFolder,uploadFiles}

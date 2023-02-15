@@ -8,8 +8,8 @@ const projectService = require('../BL/project.service');
 const { sendError, errMessage } = require('../errController');
 const util = require('util')
 const unlinkFile = util.promisify(fs.unlink)
-const { uploadFiles, getFileStream, showInFolder, uploadSavegFiles } = require('../s3')
-const {uploadRewFiles ,getAllFilesInFolder, saveRunIspObj} = require("../BL/files.service");
+const { uploadFiles, getFileStream, showInFolder, uploadSavegFiles, downloadsfile } = require('../s3')
+const { uploadRewFiles, getAllFilesInFolder, saveRunIspObj, saveResults, sendToRemoteServer } = require("../BL/files.service");
 const { openProject, setImagesToAccutur } = require('../BL/calibration.service');
 
 const urlImags = ["https://cdn.pixabay.com/photo/2023/01/05/22/36/ai-generated-7700016__340.png",
@@ -47,16 +47,14 @@ const urlImags = ["https://cdn.pixabay.com/photo/2023/01/05/22/36/ai-generated-7
  *               type: string
  *               format: binary
  */
-filesRouter.get('/images/project/:key', (req, res) => {
-    try{
+
+filesRouter.get('/images/project/:key', async (req, res) => {
+    try {
         const key = req.params.key
-        const readStream = getFileStream(key).on('error', (err) => {
-            console.log(err);
-            res.send(err)}) 
-        readStream.pipe(res)
+        await downloadsfile(res, key, getFileStream)
     }
-    catch(err){
-        res.statusCode(err.statusCode)
+    catch (err) {
+        sendError(res, err)
     }
 })
 
@@ -90,18 +88,18 @@ filesRouter.get('/images/project/:key', (req, res) => {
  *               type: string
  *               format: binary
  */
-filesRouter.get('/images/:allprojects',async (req, res) => {
-    try{
+filesRouter.get('/images/:allprojects', async (req, res) => {
+    try {
         console.log("inside");
         const readStream = await showInFolder(req.params.allprojects)
         console.log(readStream)
-        const pathes = readStream.Contents.map(v =>{
+        const pathes = readStream.Contents.map(v => {
             return v.Key.split("/")[1]
         })
         console.log(pathes);
         res.send(pathes)
     }
-    catch(err){
+    catch (err) {
         res.send(err)
     }
 })
@@ -136,8 +134,8 @@ filesRouter.get('/images/:allprojects',async (req, res) => {
  */
 filesRouter.post('/images/uploadimages', upload.any('images'), async (req, res) => {
     res.send(`we get images`)
-    const result = await uploadFiles(files,`${req.email}/${Date.now()}}`);
-    files.forEach(async file =>{
+    const result = await uploadFiles(files, `${req.email}/${Date.now()}}`);
+    files.forEach(async file => {
         await unlinkFile(file.path);
     })
     console.log(result);
@@ -178,14 +176,14 @@ filesRouter.post('/images/uploadimages', upload.any('images'), async (req, res) 
  *             schema: 
  *               type: string 
  */
-filesRouter.put('/images/runisp', async (req,res)=>{
-    try{
-       const project = await saveRunIspObj({root:req.body.root,runIspSettings:req.body.runIspSettings})
-       const urlResults = await setImagesToAccutur({project})
-       res.send({src:urlImags})  
+filesRouter.put('/images/runisp', async (req, res) => {
+    try {
+        const project = await saveRunIspObj({ root: req.body.root, runIspSettings: req.body.runIspSettings })
+        const urlResults = await setImagesToAccutur({ project })
+        res.send({ src: urlImags })
     }
-    catch(err){
-        sendError(res,err)
+    catch (err) {
+        sendError(res, err)
     }
 })
 
@@ -217,22 +215,19 @@ filesRouter.put('/images/runisp', async (req,res)=>{
  *             schema: 
  *               type: string 
  */
-
-filesRouter.put("/images/saveImages",upload.any(), async (req, res) => {
-    //update the db
-    //set to the claod
-    try{
-        const project = await projectService.updateProject(req.body.root,{saveSettings:req.body.saveSettings})
+filesRouter.put("/images/saveImages", upload.any(), async (req, res) => {
+    try {
+        const project = await projectService.updateProject(req.body.root, { saveSettings: req.body.saveSettings })
         res.send(project)
         const files = req.body.files
-        await uploadSavegFiles(files,`${project.root}/process/${Date.now()}}}`);
-        files.forEach(async file =>{
+        await uploadSavegFiles(files, `${project.root}/process/${Date.now()}}}`);
+        files.forEach(async file => {
             await unlinkFile(file.path);
-         })
-        
+        })
+
     }
-    catch(err) {
-        sendError(res,err)
+    catch (err) {
+        sendError(res, err)
     }
 })
 
@@ -273,10 +268,10 @@ filesRouter.put("/images/saveImages",upload.any(), async (req, res) => {
  *             schema: 
  *               type: string 
  */
-filesRouter.post('/', upload.any(), async (req,res)=>{
-    try{
-       const project= await uploadRewFiles({email:req.email,files:req.files})
-       res.send(project)  
+filesRouter.post('/', upload.any(), async (req, res) => {
+    try {
+        const project = await uploadRewFiles({ email: req.email, files: req.files })
+        res.send(project)
     }
     catch (err) {
         sendError(res, err)
@@ -357,15 +352,15 @@ filesRouter.get('/projects', async (req, res) => {
  *             schema:
  *               type: object
  */
-filesRouter.get('/:projectName/:folder', async (req,res)=>{
-    try{
-    const requestedFolder = `upload/${req.email}/${req.params.projectName}/${req.params.folder}`
-    
-        const files =await getAllFilesInFolder(requestedFolder)
+filesRouter.get('/:projectName/:folder', async (req, res) => {
+    try {
+        const requestedFolder = `upload/${req.email}/${req.params.projectName}/${req.params.folder}`
+
+        const files = await getAllFilesInFolder(requestedFolder)
         res.send(files)
     }
-    catch(err){
-        sendError(res,err)
+    catch (err) {
+        sendError(res, err)
     }
 
 })
@@ -405,15 +400,14 @@ filesRouter.get('/:projectName/:folder', async (req,res)=>{
  *             schema: 
  *               type: string 
  */
-filesRouter.put('/runisp', async (req,res)=>{
-    try{
-       const src= await saveRunIspObj({root:req.body.root,runIspSettings:req.body.runIspSettings})
-       //requset from accutur
-       //update the urlAfterRunIsp in project's DB
-       res.send({src:urlImags})  
+filesRouter.put('/runisp', async (req, res) => {
+    try {
+        const src = await saveRunIspObj({ root: req.body.root, runIspSettings: req.body.runIspSettings })
+        let host = req.protocol + '://' + req.get('host');
+        await sendToRemoteServer(req.body.root,res,host)
     }
-    catch(err){
-        sendError(res,err)
+    catch (err) {
+        sendError(res, err)
     }
 })
 
@@ -452,10 +446,20 @@ filesRouter.put('/runisp', async (req,res)=>{
  *             schema: 
  *               type: string
  */
-filesRouter.put('/saveSettings',async (req, res) => {
+filesRouter.put('/saveSettings', async (req, res) => {
     try {
-        await projectService.updateProject(req.body.root,req.body.saveSettings)
+        await projectService.updateProject(req.body.root, req.body.saveSettings)
         res.send("success")
+    }
+    catch (err) {
+        sendError(res, err)
+    }
+})
+
+
+filesRouter.post('/save', upload.any("files"), async (req, res) => {
+    try {
+        saveResults(req.files, req.body.path, res);
     }
     catch (err) {
         sendError(res, err)
