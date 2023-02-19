@@ -73,9 +73,10 @@ const sendToRemoteServer = async (root,res,host) => {
   const project = await projectController.readOne({ root: root });
   const inputRoot = `${project.root}/original`;
   const outputRoot = `${project.root}/output`;
-  fs.mkdirSync(outputRoot);
+  const end_frame = fs.readdirSync(inputRoot)
+  if(!fs.existsSync(outputRoot)) fs.mkdirSync(outputRoot);
   const myJson = JSON.stringify({
-    inputs: {input_folder:inputRoot,start_frame:0,end_frame:2},
+    inputs: {input_folder:inputRoot,start_frame:0,end_frame:end_frame.length},
     "outputs": 
     {
         "hsv_rep": 
