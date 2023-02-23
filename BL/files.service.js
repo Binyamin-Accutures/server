@@ -14,18 +14,11 @@ const saveResults = async (files, path, res) => {
       fs.mkdirSync(`${path}/${file.fieldname}`);
     await orderedFiles(`${path}/${file.fieldname}`, file);
   });
-  //saving AS ZIP
   const zip = new AdmZip();
   const downloadName = `processed_${path.split("/")[2]}.zip`;
   zip.addLocalFolder(path, downloadName);
-  // const data = zip.toBuffer();
-
-  // save file zip in root directory
 
   zip.writeZip(path + downloadName);
-  // res.set("Content-Type", "application/zip");
-  // res.set("Content-Disposition", `attachment; filename=${downloadName}`);
-  // res.set("Content-Length", data.length);
   res.send("http://localhost:5000"+path.split("./upload")[1]+downloadName);
 };
 

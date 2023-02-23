@@ -29,12 +29,18 @@ def SimpleISP(Params: dict):
         if OutputFolder is not None:
             if not os.path.exists(OutputFolder):
                 os.mkdir(OutputFolder)
-            dest = os.path.join(OutputFolder,file_name[:-4] + '_S0.png')
-            sio.imsave(dest,S0)
-            dest = os.path.join(OutputFolder,file_name[:-4] + '_DoLP.png')
-            sio.imsave(dest,DoLP_Colorized)
-            dest = os.path.join(OutputFolder,file_name[:-4] + '_AoLP.png')
-            sio.imsave(dest,AoLP_Colorized)
+            # dest = os.path.join(OutputFolder,file_name[:-4] + '_S0.png')
+            # sio.imsave(dest,S0)
+            # dest = os.path.join(OutputFolder,file_name[:-4] + '_DoLP.png')
+            # sio.imsave(dest,DoLP_Colorized)
+            # dest = os.path.join(OutputFolder,file_name[:-4] + '_AoLP.png')
+            # sio.imsave(dest,AoLP_Colorized)
+            DoLP_normalized = (DoLP.clip(0,1)*255).astype('uint8')
+            AoLP_normalized = ((AoLP+90)*255/180).astype('uint8')
+            S0_DoLP_AoLP_im = np.stack((S0,DoLP_normalized,AoLP_normalized),axis=2)
+            dest = os.path.join(OutputFolder,file_name[:-4] + '_S0_DoLP_AoLP.png')
+            sio.imsave(dest,S0_DoLP_AoLP_im)
+
 
 def DynamicRangeStretch(Im,Params=None):
     Min = Im.min()
