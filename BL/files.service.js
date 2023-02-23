@@ -7,7 +7,7 @@ const { checkData } = require("../checkController");
 const AdmZip = require("adm-zip");
 const { spawn } = require("child_process");
 
-const saveResults = async (files, path, res) => {
+const saveResults = async (files, path, res,host) => {
   if (!fs.existsSync(`${path}`)) fs.mkdirSync(`${path}`);
   await files.forEach(async (file) => {
     if (!fs.existsSync(`${path}/${file.fieldname}`))
@@ -19,7 +19,7 @@ const saveResults = async (files, path, res) => {
   zip.addLocalFolder(path, downloadName);
 
   zip.writeZip(path + downloadName);
-  res.send("http://localhost:5000"+path.split("./upload")[1]+downloadName);
+  res.send(host+path.split("./upload")[1]+downloadName);
 };
 
 const uploadRewFiles = async (data) => {
