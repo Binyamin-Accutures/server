@@ -33,7 +33,7 @@ const { sendError } = require("../errController");
  *             schema:
  *               type: string
  *      '400':
- *        description: In a successful response return token
+ *        description: bad request
  *        content:
  *           application/json:
  *             schema:
@@ -76,19 +76,19 @@ userRouter.post("/login", async (req, res) => {
  *        description: In a successful response return token
  *        content:
  *           application/json:
- *             schema: 
- *               type: string   
+ *             schema:
+ *               type: string
  *      '400':
  *        description: missing data
  *        content:
  *           application/json:
- *             schema: 
+ *             schema:
  *               type: string
  */
 userRouter.post("/register", async (req, res) => {
   try {
     const user = await userService.createUser(req.body);
-    res.status(200).send(user);
+    res.send(user);
   } catch (err) {
     sendError(res, err);
   }
@@ -117,15 +117,14 @@ userRouter.post("/register", async (req, res) => {
  *      '400':
  *        description: user not authorized
  */
-userRouter.get('/',auth.validToken, async (req, res) => {
-    try {
-        const user = await userService.getUser(req.email);
-        res.status(200).send(user)
-    }
-    catch (err) {
-        sendError(res,err)
-    }
-})
+userRouter.get("/", auth.validToken, async (req, res) => {
+  try {
+    const user = await userService.getUser(req.email);
+    res.status(200).send(user);
+  } catch (err) {
+    sendError(res, err);
+  }
+});
 
 /**
  * @swagger
@@ -146,21 +145,105 @@ userRouter.get('/',auth.validToken, async (req, res) => {
  *        description: In a successful response return token
  *        content:
  *           application/json:
- *             schema: 
- *               type: string   
+ *             schema:
+ *               type: string
  *      '400':
  *        description: missing data
  *        content:
  *           application/json:
- *             schema: 
+ *             schema:
  *               type: string
  */
+
 userRouter.get("/forgot", async (req, res) => {
   try {
-    const userExist = await userService.getUserAndUpdateTokenForResetPass(req.query.email);
-      res.send(userExist);
+    const response = await userService.getUserForResetPass(req.query.email);
+    res.status(200).send(response);
   } catch (err) {
     sendError(res, err);
   }
 });
+
+/**
+ * @swagger
+ * tags:
+ *  name: user
+ * /api/user/changepassword:
+ *  post:
+ *    tags: [user]
+ *    description: Use to change password
+ *    parameters:
+ *      - name: password
+ *        in: body
+ *        description: The new password
+ *        required: true
+ *        schema:
+ *          type: object
+ *          properties:
+ *            firstPassword:
+ *              type: string
+ *              format: email
+ *            secondPassword:
+ *              type: string
+ *    responses:
+ *      '200':
+ *        description: In a successful response return token
+ *        content:
+ *           application/json:
+ *             schema:
+ *               type: string
+ *      '400':
+ *        description: bad request
+ *        content:
+ *           application/json:
+ *             schema:
+ *               type: string
+ */
+
+userRouter.post("/changepassword", async (req, res) => {
+  try {
+    const user = await userService.updatePass(req.body);
+    res.status(200).send(user);
+  } catch (err) {
+    sendError(res, err);
+  }
+});
+
+/**
+ * @swagger
+ * tags:
+ *  name: user
+ * /api/user/checktoken:
+ *  get:
+ *    tags: [user]
+ *    description: check if token exists
+ *    parameters:
+ *      - name: token
+ *        in: query
+ *        description: token to reset password
+ *        required: true
+ *        type: string
+ *    responses:
+ *      '200':
+ *        description: In a successful response return token
+ *        content:
+ *           application/json:
+ *             schema:
+ *               type: string
+ *      '400':
+ *        description: missing data
+ *        content:
+ *           application/json:
+ *             schema:
+ *               type: string
+ */
+userRouter.get("/checktoken", async (req, res) => {
+  try {
+    const user = await userService.checkRestePassToken(req.query.token);
+    res.send(user);
+  } catch (err) {
+    sendError(res, err);
+  }
+});
+
 module.exports = userRouter;

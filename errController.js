@@ -5,6 +5,7 @@ const err = (c, m) => {
 const errMessage = Object.freeze({
   MISSING_DATA: err(400, "missing data"),
   USER_NOT_FOUND: err(400, "user not found"),
+  USER_NOT_AQCTIVE: err(400, "user not active"),
   USER_ALREADY_REGISTERED: err(400, "user already registered"),
   USER_NOT_REGISTERED: err(400, "user not registered"),
   SUCCESS: err(200, "success"),
@@ -15,11 +16,13 @@ const errMessage = Object.freeze({
   PROJECT_NOT_FOUND: err(400, "project not found"),
   CAN_NOT_GET_URL: err(999, "can't get url"),
   CAN_NOT_CREATE_FOLDER: err(999, "can't create folder"),
+  CAN_NOT_CHANGE_FILE_NAME:err(999, "can't chenge file name"),
+  IMG_CAN_NOT_BE_PROCESSED:err(999, "can't process image"),
 });
 
 const sendError = (res, err) => {
   console.log(err);
-  res.status(err.code||500).send(err.message||"try agien later");
+  res.status(err.code || 500).send(err.message || "try agien later");
 };
 module.exports = {
   errMessage,

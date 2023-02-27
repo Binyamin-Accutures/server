@@ -14,11 +14,9 @@ const s3 = new S3({
   secretAccessKey
 })
 
-// uploads a files to s3
 const uploadFiles = async (files, path)=> { // array of files to upload and path to location of the files in S3
   
     const params = files.map(file => {
-        console.log(file);
         return {
             Bucket: bucketName,
             Key: `${path}/${file.filename}.png`,
@@ -29,7 +27,6 @@ const uploadFiles = async (files, path)=> { // array of files to upload and path
 }
 
 async function showInFolder(path){
-    console.log(path);
     const params = {
         Bucket:bucketName,
         Prefix:path,
@@ -47,15 +44,12 @@ function getFileStream(path) {
         Bucket: bucketName,
         Key: path
     };
-    
-
-  return s3.getObject(downloadParams).createReadStream()
+    return s3.getObject(downloadParams).createReadStream()
 }
 
 
 async function uploadSavegFiles(files,path){
     const params = files.map(file => {
-        console.log(file);
         return {
             Bucket: bucketName,
             Key: `${path}/${file.filedname}/${file.filename}`,
@@ -70,8 +64,6 @@ const downloadsfile = async (res,key,func)=>{
     const readStream = func(key)
     
     readStream.on('data', (data) => {
-      console.log(`Received ${data.length} bytes of data.`);
-      console.log(data)
       res.send(data);
     });
     
