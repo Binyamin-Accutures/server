@@ -8,7 +8,7 @@ async function connect() {
   try {
     const packages = ["matplotlib", "numpy", "sys","scikit-image","opencv-python"];
     packages.forEach((package)=>{
-      exec(`pyton -m pip install ${package}`, (error, stdout, stderr) => {
+      exec(`python -m pip install ${package}`, (error, stdout, stderr) => {
         if (error) {
           console.error(
             `Failed to install package ${package}. Error message: ${error}`
