@@ -34,7 +34,3 @@ async function connect() {
 }
 
 module.exports = { connect };
-
-const { exec } = require("child_process");
-
-// Specify the package name
