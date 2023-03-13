@@ -6,17 +6,17 @@ mongoose.set("strictQuery", false);
 
 async function connect() {
   try {
-    const packages = ["matplotlib", "numpy", "sys","scikit-image","opencv-python"];
-    packages.forEach((package)=>{
-      exec(`python -m pip install ${package}`, (error, stdout, stderr) => {
-        if (error) {
-          console.error(
-            `Failed to install package ${package}. Error message: ${error}`
-          );
-        }
-        else console.log(`Package ${package} successfully installed.`);
-      });
-    })
+    // const packages = ["matplotlib", "numpy", "sys","scikit-image","opencv-python"];
+    // packages.forEach((package)=>{
+    //   exec(`python -m pip install ${package}`, (error, stdout, stderr) => {
+    //     if (error) {
+    //       console.error(
+    //         `Failed to install package ${package}. Error message: ${error}`
+    //       );
+    //     }
+    //     else console.log(`Package ${package} successfully installed.`);
+    //   });
+    // })
     mongoose.connect(
       MONGO_URL,
       { useNewUrlParser: true, useUnifiedTopology: true },
